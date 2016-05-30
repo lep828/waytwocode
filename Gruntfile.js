@@ -9,11 +9,11 @@ module.exports = function(grunt) {
     sass: {
       expanded: {
         options: { outputStyle: 'expanded' },
-        files: { 'css/app.css': 'public/scss/app.scss' }
+        files: { 'css/style.css': 'public/scss/style.scss' }
       },
       compressed: {
         options: { outputStyle: 'compressed' },
-        files: { 'css/app.min.css': 'public/scss/app.scss' }
+        files: { 'css/style.min.css': 'public/scss/style.scss' }
       }
     },
     concat: {
