@@ -36365,11 +36365,3 @@ angular.module('ui.router.state')
   .filter('isState', $IsStateFilter)
   .filter('includedByState', $IncludedByStateFilter);
 })(window, window.angular);
-angular
-  .module("PairProgramming", ["ui.router", "ngResource"])
-  .config(MainRouter);
-
-MainRouter.$inject = ["$stateProvider"];
-function MainRouter($stateProvider){
-  console.log("hi");
-}

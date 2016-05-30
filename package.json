@@ -17,11 +17,13 @@
   },
   "homepage": "https://github.com/lep828/wdi-project-4#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.1",
     "cors": "^2.7.1",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
     "grunt": "^1.0.1",
+    "grunt-bower-concat": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-uglify": "^1.0.1",

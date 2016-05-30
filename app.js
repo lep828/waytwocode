@@ -21,10 +21,10 @@ app.use(methodOverride(function(req, res){
     return method;
   }
 }));
+app.use(cors());
 
-
-app.use(express.static("/public"));
+app.use("/", express.static(__dirname + "/public"));
 
 app.listen(config.port, function(){
-  console.log("Express running on port" + config.port);
+  console.log("Express running on port " + config.port);
 });
