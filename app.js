@@ -14,11 +14,15 @@ var firebase       = require("firebase");
 // mongoose.connect(config.database);
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCaRXdIVXPh1yerAb5gAmTnE9g5UZvBdrc",
+  serviceAccount: {
+    projectId: "pair-programming-6ffa9",
+    clientEmail: "test-7@pair-programming-6ffa9.iam.gserviceaccount.com",
+    privateKey: process.env.FIREBASE_PRIVATE_KEY
+  },
+  apiKey: process.env.FIREBASE_SERVER_KEY,
   authDomain: "pair-programming-6ffa9.firebaseapp.com",
   databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
-  storageBucket: "pair-programming-6ffa9.appspot.com",
-  serviceAccount: "pair-programming-3119ebcff22f.json"
+  storageBucket: "pair-programming-6ffa9.appspot.com"
 });
 
 var database = firebase.database();

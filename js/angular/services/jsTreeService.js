@@ -59,6 +59,26 @@ function jsTreeService(CodeMirrorService){
       return treeData;
     });
 
+    var postData = {
+      'core' : {
+        'data' : treeData
+        }
+      };
+
+    $.ajax({
+      url: "/add",
+      data: postData,
+      method: "POST"
+    }).done(function(res){
+      console.log(res);
+    });
+
+    $.ajax({
+      url: "/get"
+    }).done(function(res){
+      console.log(res);
+    });
+
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');
       if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
