@@ -63,9 +63,6 @@ $(function(){
             // console.log(treeData);
 
             return treeData;
-              // id: treeData.id,
-              // text: treeData.text,
-              // parent: treeData.parent
           });
 
           $('#jstree').on('select_node.jstree', function (e, data) {
@@ -113,6 +110,8 @@ $(function(){
                   mode = "markdown";
                   break;
               }
+
+              // console.log(mode);
 
               $("#editor").empty();
               var myCodeMirror = CodeMirror(document.getElementById("editor"), {

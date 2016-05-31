@@ -14,14 +14,9 @@ module.exports = function(grunt) {
           'css': 'scss/_bower.scss'
         },
         mainFiles: {
-          jstree: [
-            'dist/jstree.min.js',
-            'dist/themes/default/style.min.css'
-          ],
           codemirror: [
             'lib/codemirror.js',
             'lib/codemirror.css',
-            'mode/ruby/ruby.js',
             'theme/monokai.css'
           ]
         },
@@ -53,6 +48,15 @@ module.exports = function(grunt) {
       jsDist: {
         src: [
           'js/_bower.js',
+          'bower_components/codemirror/mode/ruby/ruby.js',
+          'bower_components/codemirror/mode/javascript/javascript.js',
+          'bower_components/codemirror/mode/css/css.js',
+          'bower_components/codemirror/mode/markdown/markdown.js',
+          'bower_components/codemirror/mode/php/php.js',
+          'bower_components/codemirror/mode/sass/sass.js',
+          'bower_components/codemirror/mode/scss/scss.js',
+          'bower_components/codemirror/mode/htmlembedded/htmlembedded.js',
+          'bower_components/codemirror/mode/htmlmixed/htmlmixed.js',
           'js/angular/app.js',
           'js/**/*.js'
         ],
