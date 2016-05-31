@@ -67545,14 +67545,14 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
       url: "/",
       templateUrl: "views/splash.html"
     })
-    .state("index", {
-      url: "/index",
-      templateUrl: "views/home.html",
+    .state("code", {
+      url: "/code",
+      templateUrl: "views/code.html",
       controller: "MainController",
       controllerAs: "main"
     });
 
-  $urlRouterProvider.otherwise("/index");
+  $urlRouterProvider.otherwise("/code");
 }
 
 angular
@@ -67580,11 +67580,10 @@ function CodeMirrorService(FirebaseService){
     $.ajax({
       url: raw
     }).done(function(response){
-      // console.log(response);
 
-      var data = response.toString();
+      var data = response.replace(/:/g, "\:");
       FirebaseService.updateNode(node, data);
-      
+
       // $.ajax({
       //   url: "/update/" + node,
       //   method: "POST",
@@ -67701,7 +67700,7 @@ function GithubService(jsTreeService){
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
       res.forEach(function(repo){
-        $("#repos").append("<li>"+repo.full_name+"</li>");
+        $("#repos").append("<li>" + repo.full_name + "</li>");
       });
       $("#repos").delegate("li", "click", function(event){
         var repo = event.target.innerHTML;

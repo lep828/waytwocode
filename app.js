@@ -70,9 +70,12 @@ app.get("/get", function(req, res){
 
 app.post("/update/:id", function(req, res){
   var url = "/core/data/" + req.params.id;
-  // var content = req.body;
-  console.log(req.body);
-  // database.ref(url).update({ content: content });
+  // var string = req.body.toString();
+  // var content = string.replace(/:/g, "\:");
+
+  var content = req.body.toString();
+  // console.log(req.body);
+  database.ref(url).update({ content: content });
   // database.ref(url).update({content: "content goes here?"});
   // console.log(req);
 });

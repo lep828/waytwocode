@@ -12,11 +12,10 @@ function CodeMirrorService(FirebaseService){
     $.ajax({
       url: raw
     }).done(function(response){
-      // console.log(response);
 
-      var data = response.toString();
+      var data = response.replace(/:/g, "\:");
       FirebaseService.updateNode(node, data);
-      
+
       // $.ajax({
       //   url: "/update/" + node,
       //   method: "POST",
