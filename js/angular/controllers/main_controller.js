@@ -6,5 +6,5 @@ MainController.$inject = ['GithubService'];
 function MainController(GithubService){
   var self = this;
 
-
+  GithubService.start();
 }

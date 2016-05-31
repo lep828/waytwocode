@@ -9,7 +9,9 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
   $stateProvider
     .state("home", {
       url: "/",
-      templateUrl: "views/home.html"
+      templateUrl: "views/home.html",
+      controller: "MainController",
+      controllerAs: "main"
     });
 
   $urlRouterProvider.otherwise("/");

@@ -6,12 +6,12 @@ GithubService.$inject = ["jsTreeService"];
 function GithubService(jsTreeService){
   var self = this;
 
-  self.getToken = getToken;
+  self.start = getToken;
 
   function getToken(){
     $.ajax({
       url: "/token",
-      dataType: json
+      dataType: "json"
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
@@ -28,8 +28,8 @@ function GithubService(jsTreeService){
       });
       $("#repos").delegate("li", "click", function(event){
         var repo = event.target.innerHTML;
-        jsTreeService.getTree(repo, token);
         $("li").hide();
+        jsTreeService.getSha(repo, token);
       });
     });
   }
