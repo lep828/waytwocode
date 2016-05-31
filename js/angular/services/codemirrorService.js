@@ -7,11 +7,24 @@ function CodeMirrorService(){
 
   self.init = init;
 
-  function init(raw, path) {
+  function init(raw, path, node) {
     $.ajax({
       url: raw
     }).done(function(response){
       // console.log(response);
+
+
+      // var content = JSON.stringify(response);
+      $.ajax({
+        url: "/update/" + node,
+        method: "POST",
+        // data: content
+        data: response.toString()
+      }).done(function(res){
+        console.log(res);
+      });
+
+
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
         case ".html":

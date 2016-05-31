@@ -61,7 +61,7 @@ function jsTreeService(CodeMirrorService){
 
     var postData = {
       'core' : {
-        'data' : treeData
+        'data' : jsTreeData
         }
       };
 
@@ -85,7 +85,9 @@ function jsTreeService(CodeMirrorService){
 
       var raw  = "https://raw.githubusercontent.com/" + repo + "/master/" + path;
 
-      CodeMirrorService.init(raw, path);
+      var node = data.instance._data.core.selected[0];
+
+      CodeMirrorService.init(raw, path, node);
     }).jstree({ 'core' : {
       'data' : jsTreeData
     } });
