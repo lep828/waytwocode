@@ -4,13 +4,32 @@ var config         = require("./config/config");
 var bodyParser     = require("body-parser");
 var morgan         = require("morgan");
 var methodOverride = require("method-override");
-var mongoose       = require("mongoose");
-var passport       = require("passport");
-var expressJWT     = require("express-jwt");
-var cors           = require("cors");
+// var mongoose       = require("mongoose");
+// var passport       = require("passport");
+// var expressJWT     = require("express-jwt");
+// var cors           = require("cors");
 var rp             = require("request-promise");
+var firebase       = require("firebase");
 
-mongoose.connect(config.database);
+// mongoose.connect(config.database);
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCaRXdIVXPh1yerAb5gAmTnE9g5UZvBdrc",
+  authDomain: "pair-programming-6ffa9.firebaseapp.com",
+  databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
+  storageBucket: "pair-programming-6ffa9.appspot.com",
+  serviceAccount: "pair-programming-3119ebcff22f.json"
+});
+
+var database = firebase.database();
+
+database.ref("/").on("child_added", function(res){
+  console.log(res.val(), 'added');
+});
+
+database.ref("/").on("child_changed", function(res){
+  console.log(res.val(), 'changed');
+});
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
@@ -22,9 +41,33 @@ app.use(methodOverride(function(req, res){
     return method;
   }
 }));
-app.use(cors());
+// app.use(cors());
 
 app.use("/", express.static(__dirname + "/public"));
+
+app.get("/", function(req,res) {
+  res.sendFile(__dirname + "/index.html");
+});
+
+app.post("/add", function(req, res){
+  database.ref("/").set(req.body);
+  // database.ref("/core/data/2").update({content: "content goes here?"});
+});
+
+app.get("/get", function(req, res){
+  database.ref("/").on("value", function(data){
+    res.json(data.val());
+  });
+});
+
+app.post("/update/:id", function(req, res){
+  var url = "/core/data/" + req.params.id;
+  var content = req.body;
+  // console.log(req.body);
+  database.ref(url).update({ content: content });
+  // database.ref(url).update({content: "content goes here?"});
+  // console.log(req);
+});
 
 var access_token;
 
