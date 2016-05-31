@@ -21,7 +21,7 @@ module.exports = function(grunt) {
           codemirror: [
             'lib/codemirror.js',
             'lib/codemirror.css',
-            'mode/**/*.js',
+            'mode/ruby/ruby.js',
             'theme/monokai.css'
           ]
         },
@@ -33,15 +33,24 @@ module.exports = function(grunt) {
     sass: {
       expanded: {
         options: { outputStyle: 'expanded' },
-        files: { 'public/css/style.css': ['scss/_bower.scss', 'scss/style.scss'] }
+        files: { 'public/css/style.css': 'scss/build.scss' }
       },
       compressed: {
         options: { outputStyle: 'compressed' },
-        files: { 'public/css/style.min.css': ['scss/_bower.scss', 'scss/style.scss'] }
+        files: { 'public/css/style.min.css': 'scss/build.scss' }
+      },
+      dist: {
+        files: [{
+          cwd: 'styles',
+          expand: true,
+          src: ['scss/*.scss'],
+          dest: 'public/css',
+          ext: '.css'
+        }]
       }
     },
     concat: {
-      dist: {
+      jsDist: {
         src: [
           'js/_bower.js',
           'js/angular/app.js',
@@ -49,6 +58,13 @@ module.exports = function(grunt) {
         ],
         dest: 'public/js/app.js'
       },
+      scssDist: {
+        src: [
+          'scss/_bower.scss',
+          'scss/style.scss'
+        ],
+        dest: 'scss/build.scss'
+      }
     },
     uglify: {
       'public/js/app.min.js': 'public/js/app.js'
@@ -77,5 +93,5 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['jshint', 'bower_concat', 'sass', 'concat', 'uglify', 'watch']);
+  grunt.registerTask('default', ['jshint', 'bower_concat', 'concat', 'sass', 'uglify', 'watch']);
 };
