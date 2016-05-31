@@ -12,17 +12,32 @@ module.exports = function(grunt) {
         dest: {
           'js': 'js/_bower.js',
           'css': 'scss/_bower.scss'
+        },
+        mainFiles: {
+          jstree: [
+            'dist/jstree.min.js',
+            'dist/themes/default/style.min.css'
+          ],
+          codemirror: [
+            'lib/codemirror.js',
+            'lib/codemirror.css',
+            'mode/**/*.js',
+            'theme/monokai.css'
+          ]
+        },
+        dependencies: {
+          jstree: ["jquery"]
         }
       }
     },
     sass: {
       expanded: {
         options: { outputStyle: 'expanded' },
-        files: { 'public/css/style.css': 'scss/style.scss' }
+        files: { 'public/css/style.css': ['scss/_bower.scss', 'scss/style.scss'] }
       },
       compressed: {
         options: { outputStyle: 'compressed' },
-        files: { 'public/css/style.min.css': 'scss/style.scss' }
+        files: { 'public/css/style.min.css': ['scss/_bower.scss', 'scss/style.scss'] }
       }
     },
     concat: {
@@ -33,7 +48,7 @@ module.exports = function(grunt) {
           'js/**/*.js'
         ],
         dest: 'public/js/app.js'
-      }
+      },
     },
     uglify: {
       'public/js/app.min.js': 'public/js/app.js'

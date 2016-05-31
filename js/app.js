@@ -27,7 +27,7 @@ $(function(){
         url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
         dataType: "jsonp"
       }).done(function(response){
-        console.log("First response", response);
+        // console.log("First response", response);
         var sha = response.data.object.sha;
 
         $.ajax({
@@ -49,18 +49,18 @@ $(function(){
             var parent     = node.path.split("/");
             var treeData ={};
 
+            treeData.id     = treeParents[parent.join("/")];
+            treeData.text   = parent.length === 1 ? node.path : parent[parent.length-1];
+            treeData.parent = "#";
+
               if (parent.length > 1) {
                 var tempParent = node.path.split("/");
                 tempParent.pop();
                 var parentPath = tempParent.join("/");
                 // console.log(node.path, parentPath, treeParents[parentPath]);
-                treeData.parent = parent.length > 1 ? treeParents[parentPath] : "#";
+                treeData.parent = treeParents[parentPath];
               }
-
-            treeData.id     = treeParents[parent.join("/")];
-            treeData.text   = parent.length === 1 ? node.path : parent[parent.length-1];
-
-            console.log(treeData);
+            // console.log(treeData);
 
             return treeData;
               // id: treeData.id,
