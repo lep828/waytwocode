@@ -28,7 +28,7 @@ function GithubService(jsTreeService){
       });
       $("#repos").delegate("li", "click", function(event){
         var repo = event.target.innerHTML;
-        $("li").hide();
+        $("#repos").hide();
         jsTreeService.getSha(repo, token);
       });
     });

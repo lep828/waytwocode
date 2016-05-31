@@ -19,6 +19,7 @@
     "angular-resource": "^1.5.6",
     "angular-ui-router": "^0.3.0",
     "jstree": "^3.3.1",
-    "codemirror": "CodeMirror#^5.15.2"
+    "codemirror": "CodeMirror#^5.15.2",
+    "bootstrap": "^3.3.6"
   }
 }

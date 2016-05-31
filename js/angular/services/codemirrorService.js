@@ -50,6 +50,8 @@ function CodeMirrorService(){
       $("#editor").empty();
       var myCodeMirror = CodeMirror(document.getElementById("editor"), {
         lineNumbers: true,
+        lineWrapping: true,
+        tabSize: 2,
         value: response,
         mode:  mode,
         viewportMargin: Infinity,

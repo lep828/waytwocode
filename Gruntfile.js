@@ -18,10 +18,15 @@ module.exports = function(grunt) {
             'lib/codemirror.js',
             'lib/codemirror.css',
             'theme/monokai.css'
+          ],
+          bootstrap: [
+            'dist/js/bootstrap.min.js',
+            'dist/css/bootstrap.min.css'
           ]
         },
         dependencies: {
-          jstree: ["jquery"]
+          jstree: ["jquery"],
+          bootstrap: ["jquery"]
         }
       }
     },
@@ -33,15 +38,6 @@ module.exports = function(grunt) {
       compressed: {
         options: { outputStyle: 'compressed' },
         files: { 'public/css/style.min.css': 'scss/build.scss' }
-      },
-      dist: {
-        files: [{
-          cwd: 'styles',
-          expand: true,
-          src: ['scss/*.scss'],
-          dest: 'public/css',
-          ext: '.css'
-        }]
       }
     },
     concat: {
@@ -79,7 +75,7 @@ module.exports = function(grunt) {
       },
       scss: {
         files: ['scss/**/*.scss'],
-        tasks: ['sass'],
+        tasks: ['concat', 'sass'],
         options: { livereload: true }
       },
       js: {
