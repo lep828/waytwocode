@@ -79,13 +79,13 @@ $(function(){
               var mode;
               switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
                 case ".html":
-                  mode = "htmlmixed";
+                  mode = "xml";
                   break;
                 case ".erb":
-                  mode = "htmlembedded";
+                  mode = "xml";
                   break;
                 case ".ejs":
-                  mode = "htmlembedded";
+                  mode = "xml";
                   break;
                 case ".js":
                   mode = "javascript";

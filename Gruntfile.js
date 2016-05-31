@@ -55,8 +55,7 @@ module.exports = function(grunt) {
           'bower_components/codemirror/mode/php/php.js',
           'bower_components/codemirror/mode/sass/sass.js',
           'bower_components/codemirror/mode/scss/scss.js',
-          'bower_components/codemirror/mode/htmlembedded/htmlembedded.js',
-          'bower_components/codemirror/mode/htmlmixed/htmlmixed.js',
+          'bower_components/codemirror/mode/xml/xml.js',
           'js/angular/app.js',
           'js/**/*.js'
         ],
