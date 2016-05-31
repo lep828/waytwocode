@@ -6,7 +6,7 @@ var morgan         = require("morgan");
 var methodOverride = require("method-override");
 // var mongoose       = require("mongoose");
 // var passport       = require("passport");
-var expressJWT     = require("express-jwt");
+// var expressJWT     = require("express-jwt");
 // var cors           = require("cors");
 var rp             = require("request-promise");
 var firebase       = require("firebase");
@@ -17,19 +17,15 @@ var firebase       = require("firebase");
 //   serviceAccount: {
 //     projectId: "pair-programming-6ffa9",
 //     clientEmail: "test-7@pair-programming-6ffa9.iam.gserviceaccount.com",
-//     privateKey: process.env.FIREBASE_PRIVATE_KEY
+//     privateKey: "-----BEGIN PRIVATE KEY-----\n" + process.env.FIREBASE_PRIVATE_KEY + "\n-----END PRIVATE KEY-----\n"
 //   },
-//   // apiKey: process.env.FIREBASE_SERVER_KEY,
-//   // authDomain: "pair-programming-6ffa9.firebaseapp.com",
+//   apiKey: process.env.FIREBASE_SERVER_KEY,
 //   databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
-//   // storageBucket: "pair-programming-6ffa9.appspot.com"
 // });
 
 firebase.initializeApp({
   apiKey: process.env.FIREBASE_SERVER_KEY,
-  authDomain: "pair-programming-6ffa9.firebaseapp.com",
   databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
-  storageBucket: "pair-programming-6ffa9.appspot.com",
   serviceAccount: "pair-programming-3119ebcff22f.json"
 });
 
@@ -88,7 +84,7 @@ app.get("/github", function(req, res){
     client_id: process.env.GITHUB_CLIENT_ID,
     client_secret:  process.env.GITHUB_CLIENT_SECRET,
     code: req.query.code,
-    redirect_uri: "http://localhost:3000/github/callback"
+    redirect_uri: "http://localhost:3000/github"
   };
   var params = serializeObject(data);
 

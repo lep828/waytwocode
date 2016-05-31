@@ -67570,7 +67570,8 @@ angular
   .module("PairProgramming")
   .service("CodeMirrorService", CodeMirrorService);
 
-function CodeMirrorService(){
+CodeMirrorService.$inject = ["FirebaseService"];
+function CodeMirrorService(FirebaseService){
   var self = this;
 
   self.init = init;
@@ -67581,17 +67582,17 @@ function CodeMirrorService(){
     }).done(function(response){
       // console.log(response);
 
-
-      // var content = JSON.stringify(response);
-      $.ajax({
-        url: "/update/" + node,
-        method: "POST",
-        // data: content
-        data: response.toString()
-      }).done(function(res){
-        console.log(res);
-      });
-
+      var data = response.toString();
+      FirebaseService.updateNode(node, data);
+      
+      // $.ajax({
+      //   url: "/update/" + node,
+      //   method: "POST",
+      //   // data: content
+      //   data: response.toString()
+      // }).done(function(res){
+      //   console.log(res);
+      // });
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
@@ -67644,6 +67645,37 @@ function CodeMirrorService(){
 
 angular
   .module("PairProgramming")
+  .service("FirebaseService", FirebaseService);
+
+function FirebaseService(){
+  var self = this;
+
+  self.addData = addData;
+  self.updateNode = updateNode;
+
+  function updateNode(node, data){
+    $.ajax({
+      url: "/update/" + node,
+      method: "POST",
+      data: data
+    }).done(function(res){
+      console.log(res);
+    });
+  }
+
+  function addData(data){
+    $.ajax({
+      url: "/add",
+      data: data,
+      method: "POST"
+    }).done(function(res){
+      console.log(res);
+    });
+  }
+}
+
+angular
+  .module("PairProgramming")
   .service("GithubService", GithubService);
 
 GithubService.$inject = ["jsTreeService"];
@@ -67678,16 +67710,14 @@ function GithubService(jsTreeService){
       });
     });
   }
-
-  // remove token?
 }
 
 angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService"];
-function jsTreeService(CodeMirrorService){
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService"];
+function jsTreeService(CodeMirrorService, FirebaseService){
   var self = this;
 
   self.getSha = getSha;
@@ -67749,13 +67779,15 @@ function jsTreeService(CodeMirrorService){
         }
       };
 
-    $.ajax({
-      url: "/add",
-      data: postData,
-      method: "POST"
-    }).done(function(res){
-      console.log(res);
-    });
+      FirebaseService.addData(postData);
+
+    // $.ajax({
+    //   url: "/add",
+    //   data: postData,
+    //   method: "POST"
+    // }).done(function(res){
+    //   console.log(res);
+    // });
 
     $.ajax({
       url: "/get"

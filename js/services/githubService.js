@@ -34,6 +34,4 @@ function GithubService(jsTreeService){
       });
     });
   }
-
-  // remove token?
 }

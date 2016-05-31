@@ -2,7 +2,8 @@ angular
   .module("PairProgramming")
   .service("CodeMirrorService", CodeMirrorService);
 
-function CodeMirrorService(){
+CodeMirrorService.$inject = ["FirebaseService"];
+function CodeMirrorService(FirebaseService){
   var self = this;
 
   self.init = init;
@@ -13,17 +14,17 @@ function CodeMirrorService(){
     }).done(function(response){
       // console.log(response);
 
-
-      // var content = JSON.stringify(response);
-      $.ajax({
-        url: "/update/" + node,
-        method: "POST",
-        // data: content
-        data: response.toString()
-      }).done(function(res){
-        console.log(res);
-      });
-
+      var data = response.toString();
+      FirebaseService.updateNode(node, data);
+      
+      // $.ajax({
+      //   url: "/update/" + node,
+      //   method: "POST",
+      //   // data: content
+      //   data: response.toString()
+      // }).done(function(res){
+      //   console.log(res);
+      // });
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {

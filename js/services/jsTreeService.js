@@ -2,8 +2,8 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService"];
-function jsTreeService(CodeMirrorService){
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService"];
+function jsTreeService(CodeMirrorService, FirebaseService){
   var self = this;
 
   self.getSha = getSha;
@@ -65,13 +65,15 @@ function jsTreeService(CodeMirrorService){
         }
       };
 
-    $.ajax({
-      url: "/add",
-      data: postData,
-      method: "POST"
-    }).done(function(res){
-      console.log(res);
-    });
+      FirebaseService.addData(postData);
+
+    // $.ajax({
+    //   url: "/add",
+    //   data: postData,
+    //   method: "POST"
+    // }).done(function(res){
+    //   console.log(res);
+    // });
 
     $.ajax({
       url: "/get"
