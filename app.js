@@ -40,13 +40,17 @@ app.get("/github", function(req, res){
   return rp("https://github.com/login/oauth/access_token?" + params)
     .then(function(response){
       access_token = deserializeObject(response).access_token;
-      res.redirect("/");
+      res.redirect("/index");
     });
 });
 
 app.get("/token", function(req, res){
   console.log(access_token);
   res.json({token: access_token});
+});
+
+app.get("/*", function(req, res){
+  res.redirect("/");
 });
 
 app.listen(config.port, function(){

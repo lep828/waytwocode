@@ -7,12 +7,16 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
   $locationProvider.html5Mode(true);
 
   $stateProvider
-    .state("home", {
+    .state("splash", {
       url: "/",
+      templateUrl: "views/splash.html"
+    })
+    .state("index", {
+      url: "/index",
       templateUrl: "views/home.html",
       controller: "MainController",
       controllerAs: "main"
     });
 
-  $urlRouterProvider.otherwise("/");
+  $urlRouterProvider.otherwise("/index");
 }

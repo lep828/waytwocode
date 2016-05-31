@@ -66978,14 +66978,18 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
   $locationProvider.html5Mode(true);
 
   $stateProvider
-    .state("home", {
+    .state("splash", {
       url: "/",
+      templateUrl: "views/splash.html"
+    })
+    .state("index", {
+      url: "/index",
       templateUrl: "views/home.html",
       controller: "MainController",
       controllerAs: "main"
     });
 
-  $urlRouterProvider.otherwise("/");
+  $urlRouterProvider.otherwise("/index");
 }
 
 angular
@@ -67079,6 +67083,7 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
+      $("#githubLogin").hide();
       getRepo(token);
     });
   }

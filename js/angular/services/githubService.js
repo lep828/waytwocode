@@ -15,6 +15,7 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
+      $("#githubLogin").hide();
       getRepo(token);
     });
   }
