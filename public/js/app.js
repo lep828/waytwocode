@@ -67757,7 +67757,14 @@ function jsTreeService(CodeMirrorService, FirebaseService){
 
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
-      var treeData ={};
+      var treeData   = {};
+      var path       = parent[parent.length-1];
+
+      if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
+       treeData.type = "folder";
+     } else {
+       treeData.type = "file";
+     }
 
       treeData.id     = treeParents[parent.join("/")];
       treeData.text   = parent.length === 1 ? node.path : parent[parent.length-1];
@@ -67769,7 +67776,6 @@ function jsTreeService(CodeMirrorService, FirebaseService){
           var parentPath = tempParent.join("/");
           // console.log(node.path, parentPath, treeParents[parentPath]);
           treeData.parent = treeParents[parentPath];
-          treeData.type = "file";
         }
       // console.log(treeData);
 
@@ -67807,7 +67813,7 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       'data' : jsTreeData
     },
     "types" : {
-      "default" : {
+      "folder" : {
         "icon" : "glyphicon glyphicon-folder-open"
       },
       "file" : {
