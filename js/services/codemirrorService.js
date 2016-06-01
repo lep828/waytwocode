@@ -13,7 +13,7 @@ function CodeMirrorService(FirebaseService){
       url: raw
     }).done(function(response){
       var data = { content: btoa(response)};
-      // FirebaseService.updateNode(node, data, user);
+      FirebaseService.updateNode(node, data);
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {

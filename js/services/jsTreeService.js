@@ -63,12 +63,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
-    var postData = {};
-    var user = self.user.login;
     var data = { 'core' : { 'data' : jsTreeData } };
-    postData[user] = data;
-    FirebaseService.addData(postData);
 
+    FirebaseService.addData(data);
     // $.ajax({
     //   url: "/get"
     // }).done(function(res){

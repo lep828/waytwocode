@@ -67566,7 +67566,7 @@ function MainController(GithubService){
 
   $("#code").on("click", function(){
     GithubService.start();
-    var user = GithubService.user;
+    // var user = GithubService.user;
     // console.log(user, "here");
   });
 }
@@ -67586,7 +67586,7 @@ function CodeMirrorService(FirebaseService){
       url: raw
     }).done(function(response){
       var data = { content: btoa(response)};
-      // FirebaseService.updateNode(node, data, user);
+      FirebaseService.updateNode(node, data);
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
@@ -67647,14 +67647,14 @@ function FirebaseService(){
   self.addData = addData;
   self.updateNode = updateNode;
 
-  function updateNode(node, data, user){
+  function updateNode(node, data){
     $.ajax({
-      url: "/update/" + user.login + "/" + node,
+      url: "/update/" + self.key + "/" + node,
       method: "POST",
       data: data
     }).done(function(res){
-      // console.log(atob(res.content));
-      console.log("updated stuff");
+      console.log(atob(res.content));
+      // console.log("updated stuff");
     });
   }
 
@@ -67664,7 +67664,7 @@ function FirebaseService(){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
+      self.key = res.key;
     });
   }
 }
@@ -67784,12 +67784,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
-    var postData = {};
-    var user = self.user.login;
     var data = { 'core' : { 'data' : jsTreeData } };
-    postData[user] = data;
-    FirebaseService.addData(postData);
 
+    FirebaseService.addData(data);
     // $.ajax({
     //   url: "/get"
     // }).done(function(res){

@@ -8,14 +8,14 @@ function FirebaseService(){
   self.addData = addData;
   self.updateNode = updateNode;
 
-  function updateNode(node, data, user){
+  function updateNode(node, data){
     $.ajax({
-      url: "/update/" + user.login + "/" + node,
+      url: "/update/" + self.key + "/" + node,
       method: "POST",
       data: data
     }).done(function(res){
-      // console.log(atob(res.content));
-      console.log("updated stuff");
+      console.log(atob(res.content));
+      // console.log("updated stuff");
     });
   }
 
@@ -25,7 +25,7 @@ function FirebaseService(){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
+      self.key = res.key;
     });
   }
 }

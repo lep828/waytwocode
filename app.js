@@ -58,8 +58,9 @@ app.get("/", function(req,res) {
 });
 
 app.post("/add", function(req, res){
-  database.ref("/").push(req.body);
-  res.json(req.body);
+  var newPostKey = database.ref("/").push().key;
+  database.ref("/" + newPostKey).update(req.body);
+  res.json({ key: newPostKey });
 });
 
 app.get("/get", function(req, res){
@@ -68,9 +69,9 @@ app.get("/get", function(req, res){
   });
 });
 
-app.post("/update/:user/:id", function(req, res){
+app.post("/update/:key/:id", function(req, res){
   console.log(req.params);
-  var url = req.params.user + "/core/data/" + req.params.id;
+  var url = req.params.key + "/core/data/" + req.params.id;
   database.ref(url).update(req.body);
   res.json(req.body);
 });
