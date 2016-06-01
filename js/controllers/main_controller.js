@@ -7,7 +7,7 @@ function MainController(GithubService){
   var self = this;
 
 
-  $("#code").on("click", function(){
+  $("#repositories").on("click", function(){
     GithubService.start();
     // var user = GithubService.user;
     // console.log(user, "here");

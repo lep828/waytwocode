@@ -11,12 +11,14 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
       url: "/",
       templateUrl: "views/splash.html"
     })
+    .state("repos", {
+      url: "/repositories",
+      templateUrl: "views/repos.html"
+    })
     .state("code", {
-      url: "/code",
-      templateUrl: "views/code.html",
-      // controller: "MainController",
-      // controllerAs: "main"
+      url: "/code/:key",
+      templateUrl: "views/code.html"
     });
 
-  $urlRouterProvider.otherwise("/code");
+  $urlRouterProvider.otherwise("/");
 }

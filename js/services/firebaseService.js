@@ -2,7 +2,8 @@ angular
   .module("PairProgramming")
   .service("FirebaseService", FirebaseService);
 
-function FirebaseService(){
+FirebaseService.$inject = ["$state"];
+function FirebaseService($state){
   var self = this;
 
   self.addData = addData;
@@ -26,6 +27,7 @@ function FirebaseService(){
       data: data
     }).done(function(res){
       self.key = res.key;
+      $state.go("code", { key: self.key });
     });
   }
 }

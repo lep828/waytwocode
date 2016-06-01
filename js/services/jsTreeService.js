@@ -64,13 +64,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
     });
 
     var data = { 'core' : { 'data' : jsTreeData } };
-
     FirebaseService.addData(data);
-    // $.ajax({
-    //   url: "/get"
-    // }).done(function(res){
-    //   console.log(res);
-    // });
+
+
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');

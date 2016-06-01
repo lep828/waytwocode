@@ -67545,14 +67545,16 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
       url: "/",
       templateUrl: "views/splash.html"
     })
+    .state("repos", {
+      url: "/repositories",
+      templateUrl: "views/repos.html"
+    })
     .state("code", {
-      url: "/code",
-      templateUrl: "views/code.html",
-      // controller: "MainController",
-      // controllerAs: "main"
+      url: "/code/:key",
+      templateUrl: "views/code.html"
     });
 
-  $urlRouterProvider.otherwise("/code");
+  $urlRouterProvider.otherwise("/");
 }
 
 angular
@@ -67564,7 +67566,7 @@ function MainController(GithubService){
   var self = this;
 
 
-  $("#code").on("click", function(){
+  $("#repositories").on("click", function(){
     GithubService.start();
     // var user = GithubService.user;
     // console.log(user, "here");
@@ -67641,7 +67643,8 @@ angular
   .module("PairProgramming")
   .service("FirebaseService", FirebaseService);
 
-function FirebaseService(){
+FirebaseService.$inject = ["$state"];
+function FirebaseService($state){
   var self = this;
 
   self.addData = addData;
@@ -67665,6 +67668,7 @@ function FirebaseService(){
       data: data
     }).done(function(res){
       self.key = res.key;
+      $state.go("code", { key: self.key });
     });
   }
 }
@@ -67785,13 +67789,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
     });
 
     var data = { 'core' : { 'data' : jsTreeData } };
-
     FirebaseService.addData(data);
-    // $.ajax({
-    //   url: "/get"
-    // }).done(function(res){
-    //   console.log(res);
-    // });
+
+
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');
