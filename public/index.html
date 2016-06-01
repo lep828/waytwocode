@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="PairProgramming">
 <head>
   <meta charset="utf-8">
   <title>PearCoders</title>
@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.min.css">
   <base href="/">
 </head>
-<body ng-app="PairProgramming">
+<body ng-controller="MainController as main">
   <header>
     <nav class="navbar navbar-default">
       <div class="container">
@@ -25,7 +25,7 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/code">Code</a></li>
+            <li><a href="/code" id="code">Code</a></li>
             <li>
               <a href="https://github.com/login/oauth/authorize?client_id=e28a001aa9eecc8286f6&redirect_uri=http://localhost:3000/github&scope=repo" id="githubLogin">Login with Github</a>
             </li>

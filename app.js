@@ -94,7 +94,6 @@ app.get("/github", function(req, res){
 });
 
 app.get("/token", function(req, res){
-  console.log(access_token);
   res.json({token: access_token});
 });
 

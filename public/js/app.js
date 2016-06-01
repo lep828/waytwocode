@@ -67548,8 +67548,8 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
     .state("code", {
       url: "/code",
       templateUrl: "views/code.html",
-      controller: "MainController",
-      controllerAs: "main"
+      // controller: "MainController",
+      // controllerAs: "main"
     });
 
   $urlRouterProvider.otherwise("/code");
@@ -67563,7 +67563,12 @@ MainController.$inject = ['GithubService'];
 function MainController(GithubService){
   var self = this;
 
-  GithubService.start();
+
+  $("#code").on("click", function(){
+    GithubService.start();
+    var user = GithubService.user;
+    console.log(user, "here");
+  });
 }
 
 angular
@@ -67580,7 +67585,6 @@ function CodeMirrorService(FirebaseService){
     $.ajax({
       url: raw
     }).done(function(response){
-
       var data = { content: btoa(response)};
       FirebaseService.updateNode(node, data);
 
@@ -67673,7 +67677,16 @@ GithubService.$inject = ["jsTreeService"];
 function GithubService(jsTreeService){
   var self = this;
 
-  self.start = getToken;
+  self.start    = getToken;
+  self.getUser  = getUser;
+
+  function getUser(){
+    $.ajax({
+      url: "https://api.github.com/user?access_token=" + self.token,
+    }).done(function(res){
+      self.user = res;
+    });
+  }
 
   function getToken(){
     $.ajax({
@@ -67682,13 +67695,14 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
-      // $("#githubLogin").hide();
+      $("#githubLogin").hide();
+      self.token = token;
+      getUser();
       getRepo(token);
     });
   }
 
   function getRepo(token){
-    $("#githubLogin").hide();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){

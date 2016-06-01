@@ -6,7 +6,16 @@ GithubService.$inject = ["jsTreeService"];
 function GithubService(jsTreeService){
   var self = this;
 
-  self.start = getToken;
+  self.start    = getToken;
+  self.getUser  = getUser;
+
+  function getUser(){
+    $.ajax({
+      url: "https://api.github.com/user?access_token=" + self.token,
+    }).done(function(res){
+      self.user = res;
+    });
+  }
 
   function getToken(){
     $.ajax({
@@ -15,13 +24,14 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
-      // $("#githubLogin").hide();
+      $("#githubLogin").hide();
+      self.token = token;
+      getUser();
       getRepo(token);
     });
   }
 
   function getRepo(token){
-    $("#githubLogin").hide();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){

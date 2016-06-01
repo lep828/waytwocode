@@ -14,8 +14,8 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
     .state("code", {
       url: "/code",
       templateUrl: "views/code.html",
-      controller: "MainController",
-      controllerAs: "main"
+      // controller: "MainController",
+      // controllerAs: "main"
     });
 
   $urlRouterProvider.otherwise("/code");
