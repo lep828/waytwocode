@@ -8,12 +8,12 @@ function CodeMirrorService(FirebaseService){
 
   self.init = init;
 
-  function init(raw, path, node) {
+  function init(raw, path, node, user) {
     $.ajax({
       url: raw
     }).done(function(response){
       var data = { content: btoa(response)};
-      FirebaseService.updateNode(node, data);
+      // FirebaseService.updateNode(node, data, user);
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {

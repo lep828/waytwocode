@@ -58,7 +58,7 @@ app.get("/", function(req,res) {
 });
 
 app.post("/add", function(req, res){
-  database.ref("/").set(req.body);
+  database.ref("/").push(req.body);
   res.json(req.body);
 });
 
@@ -68,10 +68,10 @@ app.get("/get", function(req, res){
   });
 });
 
-app.post("/update/:id", function(req, res){
-  var url = "/core/data/" + req.params.id;
-  var content = req.body;
-  database.ref(url).update(content);
+app.post("/update/:user/:id", function(req, res){
+  console.log(req.params);
+  var url = req.params.user + "/core/data/" + req.params.id;
+  database.ref(url).update(req.body);
   res.json(req.body);
 });
 

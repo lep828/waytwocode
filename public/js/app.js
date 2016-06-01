@@ -67567,7 +67567,7 @@ function MainController(GithubService){
   $("#code").on("click", function(){
     GithubService.start();
     var user = GithubService.user;
-    console.log(user, "here");
+    // console.log(user, "here");
   });
 }
 
@@ -67581,12 +67581,12 @@ function CodeMirrorService(FirebaseService){
 
   self.init = init;
 
-  function init(raw, path, node) {
+  function init(raw, path, node, user) {
     $.ajax({
       url: raw
     }).done(function(response){
       var data = { content: btoa(response)};
-      FirebaseService.updateNode(node, data);
+      // FirebaseService.updateNode(node, data, user);
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
@@ -67647,9 +67647,9 @@ function FirebaseService(){
   self.addData = addData;
   self.updateNode = updateNode;
 
-  function updateNode(node, data){
+  function updateNode(node, data, user){
     $.ajax({
-      url: "/update/" + node,
+      url: "/update/" + user.login + "/" + node,
       method: "POST",
       data: data
     }).done(function(res){
@@ -67697,22 +67697,23 @@ function GithubService(jsTreeService){
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
-      getUser();
       getRepo(token);
     });
   }
 
   function getRepo(token){
+    getUser();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
+        $("#repos").empty();
       res.forEach(function(repo){
         $("#repos").append("<li>" + repo.full_name + "</li>");
       });
       $("#repos").delegate("li", "click", function(event){
         var repo = event.target.innerHTML;
         $("#repos").hide();
-        jsTreeService.getSha(repo, token);
+        jsTreeService.getSha(repo, token, self.user);
       });
     });
   }
@@ -67728,7 +67729,8 @@ function jsTreeService(CodeMirrorService, FirebaseService){
 
   self.getSha = getSha;
 
-  function getSha(repo, token){
+  function getSha(repo, token, user){
+    self.user = user;
     $.ajax({
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
@@ -67782,8 +67784,10 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
-    var postData = { 'core' : { 'data' : jsTreeData } };
-
+    var postData = {};
+    var user = self.user.login;
+    var data = { 'core' : { 'data' : jsTreeData } };
+    postData[user] = data;
     FirebaseService.addData(postData);
 
     // $.ajax({
@@ -67800,7 +67804,7 @@ function jsTreeService(CodeMirrorService, FirebaseService){
 
       var node = data.instance._data.core.selected[0];
 
-      CodeMirrorService.init(raw, path, node);
+      CodeMirrorService.init(raw, path, node, self.user);
     }).jstree({
     "core" : {
       "data" : jsTreeData

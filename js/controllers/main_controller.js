@@ -10,6 +10,6 @@ function MainController(GithubService){
   $("#code").on("click", function(){
     GithubService.start();
     var user = GithubService.user;
-    console.log(user, "here");
+    // console.log(user, "here");
   });
 }

@@ -8,9 +8,9 @@ function FirebaseService(){
   self.addData = addData;
   self.updateNode = updateNode;
 
-  function updateNode(node, data){
+  function updateNode(node, data, user){
     $.ajax({
-      url: "/update/" + node,
+      url: "/update/" + user.login + "/" + node,
       method: "POST",
       data: data
     }).done(function(res){
