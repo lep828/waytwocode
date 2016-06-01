@@ -26,7 +26,7 @@ module.exports = function(grunt) {
         },
         dependencies: {
           jstree: ["jquery"],
-          bootstrap: ["jquery"]
+          bootstrap: ["jquery", "tether"]
         }
       }
     },

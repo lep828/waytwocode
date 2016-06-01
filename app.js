@@ -31,13 +31,13 @@ firebase.initializeApp({
 
 var database = firebase.database();
 
-database.ref("/").on("child_added", function(res){
-  // console.log(res.val(), 'added');
-});
-
-database.ref("/").on("child_changed", function(res){
-  // console.log(res.val(), 'changed');
-});
+// database.ref("/").on("child_added", function(res){
+//   // console.log(res.val(), 'added');
+// });
+//
+// database.ref("/").on("child_changed", function(res){
+//   // console.log(res.val(), 'changed');
+// });
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
@@ -71,7 +71,6 @@ app.get("/get_data/:key", function(req, res){
 });
 
 app.post("/update/:key/:id", function(req, res){
-  console.log(req.params);
   var url = req.params.key + "/core/data/" + req.params.id;
   database.ref(url).update(req.body);
   res.json(req.body);
