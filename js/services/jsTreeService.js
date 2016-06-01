@@ -9,9 +9,10 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
   var self = this;
   self.getSha = getSha;
 
-  function getSha(repo, token, user){
+  function getSha(repo, token){
+    FirebaseService.getData(FirebaseService.key);
+
     $state.go("code", { key: FirebaseService.key });
-    self.user = user;
     $.ajax({
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
@@ -77,7 +78,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
       var node = data.instance._data.core.selected[0];
 
-      CodeMirrorService.init(raw, path, node, self.user);
+      CodeMirrorService.init(raw, path, node);
     }).jstree({
     "core" : {
       "data" : jsTreeData

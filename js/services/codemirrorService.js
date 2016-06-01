@@ -8,7 +8,7 @@ function CodeMirrorService(FirebaseService){
 
   self.init = init;
 
-  function init(raw, path, node, user) {
+  function init(raw, path, node) {
     $.ajax({
       url: raw
     }).done(function(response){

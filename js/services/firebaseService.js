@@ -9,12 +9,22 @@ function FirebaseService($state){
   self.addData    = addData;
   self.updateNode = updateNode;
   self.createKey  = createKey;
+  self.getData    = getData;
+
+  function getData(key){
+    url = "/get_data/" + key;
+    $.ajax({
+      url: url
+    }).done(function(res){
+      console.log("got ", res);
+    });
+  }
 
   function createKey(){
     $.ajax({
       url: "/key"
     }).done(function(res){
-      console.log(res.key);
+      // console.log(res.key);
       self.key = res.key;
     });
   }
@@ -25,8 +35,8 @@ function FirebaseService($state){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(atob(res.content));
-      // console.log("updated stuff");
+      // console.log(atob(res.content));
+      console.log("updated stuff");
     });
   }
 

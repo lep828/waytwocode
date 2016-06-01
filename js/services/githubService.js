@@ -7,15 +7,15 @@ function GithubService(jsTreeService){
   var self = this;
 
   self.start    = getToken;
-  self.getUser  = getUser;
-
-  function getUser(){
-    $.ajax({
-      url: "https://api.github.com/user?access_token=" + self.token,
-    }).done(function(res){
-      self.user = res;
-    });
-  }
+  // self.getUser  = getUser;
+  //
+  // function getUser(){
+  //   $.ajax({
+  //     url: "https://api.github.com/user?access_token=" + self.token,
+  //   }).done(function(res){
+  //     self.user = res;
+  //   });
+  // }
 
   function getToken(){
     $.ajax({
@@ -31,7 +31,7 @@ function GithubService(jsTreeService){
   }
 
   function getRepo(token){
-    getUser();
+    // getUser();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
@@ -42,7 +42,7 @@ function GithubService(jsTreeService){
       $("#repos").delegate("li", "click", function(event){
         var repo = event.target.innerHTML;
         $("#repos").hide();
-        jsTreeService.getSha(repo, token, self.user);
+        jsTreeService.getSha(repo, token);
       });
     });
   }

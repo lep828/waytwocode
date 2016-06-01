@@ -3,7 +3,7 @@ var app            = express();
 var config         = require("./config/config");
 var bodyParser     = require("body-parser");
 var morgan         = require("morgan");
-var methodOverride = require("method-override");
+// var methodOverride = require("method-override");
 // var mongoose       = require("mongoose");
 // var passport       = require("passport");
 // var expressJWT     = require("express-jwt");
@@ -42,13 +42,13 @@ database.ref("/").on("child_changed", function(res){
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(methodOverride(function(req, res){
-  if (req.body && typeof req.body === "object" && "_method" in req.body){
-    var method = req.body._method;
-    delete req.body._method;
-    return method;
-  }
-}));
+// app.use(methodOverride(function(req, res){
+//   if (req.body && typeof req.body === "object" && "_method" in req.body){
+//     var method = req.body._method;
+//     delete req.body._method;
+//     return method;
+//   }
+// }));
 // app.use(cors());
 
 app.use("/", express.static(__dirname + "/public"));
@@ -58,17 +58,14 @@ app.get("/", function(req, res) {
 });
 
 app.post("/add/:key", function(req, res){
-  // var newPostKey = database.ref("/").push().key;
-  // database.ref("/" + newPostKey).update(req.body);
-  // res.json({ key: newPostKey });
-
   var key = req.params.key;
   database.ref("/" + key).update(req.body);
   res.json({ key: key });
 });
 
-app.get("/get", function(req, res){
-  database.ref("/").on("value", function(data){
+app.get("/get_data/:key", function(req, res){
+  var url = req.params.key;
+  database.ref(url).on("value", function(data){
     res.json(data.val());
   });
 });
