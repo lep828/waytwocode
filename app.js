@@ -60,7 +60,6 @@ app.get("/", function(req,res) {
 app.post("/add", function(req, res){
   database.ref("/").set(req.body);
   res.json(req.body);
-  // database.ref("/core/data/2").update({content: "content goes here?"});
 });
 
 app.get("/get", function(req, res){
@@ -71,12 +70,8 @@ app.get("/get", function(req, res){
 
 app.post("/update/:id", function(req, res){
   var url = "/core/data/" + req.params.id;
-  // var string = req.body.toString();
-  // var content = string.replace(/:/g, "\:");
-
   var content = req.body;
   database.ref(url).update(content);
-  // console.log({ content: req.body });
   res.json(req.body);
 });
 

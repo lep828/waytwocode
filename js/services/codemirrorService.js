@@ -12,20 +12,8 @@ function CodeMirrorService(FirebaseService){
     $.ajax({
       url: raw
     }).done(function(response){
-
-      // var data = response.replace(/:/g, "\:");
       var data = { content: btoa(response)};
-      // console.log(data);
       FirebaseService.updateNode(node, data);
-
-      // $.ajax({
-      //   url: "/update/" + node,
-      //   method: "POST",
-      //   // data: content
-      //   data: response.toString()
-      // }).done(function(res){
-      //   console.log(res);
-      // });
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {

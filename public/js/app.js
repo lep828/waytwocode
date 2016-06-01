@@ -67581,19 +67581,8 @@ function CodeMirrorService(FirebaseService){
       url: raw
     }).done(function(response){
 
-      // var data = response.replace(/:/g, "\:");
       var data = { content: btoa(response)};
-      // console.log(data);
       FirebaseService.updateNode(node, data);
-
-      // $.ajax({
-      //   url: "/update/" + node,
-      //   method: "POST",
-      //   // data: content
-      //   data: response.toString()
-      // }).done(function(res){
-      //   console.log(res);
-      // });
 
       var mode;
       switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
@@ -67661,15 +67650,15 @@ function FirebaseService(){
       data: data
     }).done(function(res){
       // console.log(atob(res.content));
-      console.log("got stuff");
+      console.log("updated stuff");
     });
   }
 
   function addData(data){
     $.ajax({
       url: "/add",
-      data: data,
-      method: "POST"
+      method: "POST",
+      data: data
     }).done(function(res){
       console.log(res);
     });
@@ -67693,12 +67682,13 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
-      $("#githubLogin").hide();
+      // $("#githubLogin").hide();
       getRepo(token);
     });
   }
 
   function getRepo(token){
+    $("#githubLogin").hide();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
@@ -67753,8 +67743,6 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       treeParents[node.path] = tree.indexOf(node);
     });
 
-    // console.log(treeParents);
-
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
       var treeData   = {};
@@ -67774,10 +67762,8 @@ function jsTreeService(CodeMirrorService, FirebaseService){
           var tempParent = node.path.split("/");
           tempParent.pop();
           var parentPath = tempParent.join("/");
-          // console.log(node.path, parentPath, treeParents[parentPath]);
           treeData.parent = treeParents[parentPath];
         }
-      // console.log(treeData);
 
       return treeData;
     });
@@ -67785,14 +67771,6 @@ function jsTreeService(CodeMirrorService, FirebaseService){
     var postData = { 'core' : { 'data' : jsTreeData } };
 
     FirebaseService.addData(postData);
-
-    // $.ajax({
-    //   url: "/add",
-    //   data: postData,
-    //   method: "POST"
-    // }).done(function(res){
-    //   console.log(res);
-    // });
 
     // $.ajax({
     //   url: "/get"
@@ -67809,8 +67787,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       var node = data.instance._data.core.selected[0];
 
       CodeMirrorService.init(raw, path, node);
-    }).jstree({ 'core' : {
-      'data' : jsTreeData
+    }).jstree({
+    "core" : {
+      "data" : jsTreeData
     },
     "types" : {
       "folder" : {

@@ -15,15 +15,15 @@ function FirebaseService(){
       data: data
     }).done(function(res){
       // console.log(atob(res.content));
-      console.log("got stuff");
+      console.log("updated stuff");
     });
   }
 
   function addData(data){
     $.ajax({
       url: "/add",
-      data: data,
-      method: "POST"
+      method: "POST",
+      data: data
     }).done(function(res){
       console.log(res);
     });

@@ -15,12 +15,13 @@ function GithubService(jsTreeService){
     }).done(function(res){
       var token = res.token;
       if(!token) return false;
-      $("#githubLogin").hide();
+      // $("#githubLogin").hide();
       getRepo(token);
     });
   }
 
   function getRepo(token){
+    $("#githubLogin").hide();
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){

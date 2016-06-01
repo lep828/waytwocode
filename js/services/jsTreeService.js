@@ -37,8 +37,6 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       treeParents[node.path] = tree.indexOf(node);
     });
 
-    // console.log(treeParents);
-
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
       var treeData   = {};
@@ -58,10 +56,8 @@ function jsTreeService(CodeMirrorService, FirebaseService){
           var tempParent = node.path.split("/");
           tempParent.pop();
           var parentPath = tempParent.join("/");
-          // console.log(node.path, parentPath, treeParents[parentPath]);
           treeData.parent = treeParents[parentPath];
         }
-      // console.log(treeData);
 
       return treeData;
     });
@@ -69,14 +65,6 @@ function jsTreeService(CodeMirrorService, FirebaseService){
     var postData = { 'core' : { 'data' : jsTreeData } };
 
     FirebaseService.addData(postData);
-
-    // $.ajax({
-    //   url: "/add",
-    //   data: postData,
-    //   method: "POST"
-    // }).done(function(res){
-    //   console.log(res);
-    // });
 
     // $.ajax({
     //   url: "/get"
@@ -93,8 +81,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       var node = data.instance._data.core.selected[0];
 
       CodeMirrorService.init(raw, path, node);
-    }).jstree({ 'core' : {
-      'data' : jsTreeData
+    }).jstree({
+    "core" : {
+      "data" : jsTreeData
     },
     "types" : {
       "folder" : {
