@@ -59,6 +59,7 @@ app.get("/", function(req,res) {
 
 app.post("/add", function(req, res){
   database.ref("/").set(req.body);
+  res.json(req.body);
   // database.ref("/core/data/2").update({content: "content goes here?"});
 });
 
@@ -73,11 +74,10 @@ app.post("/update/:id", function(req, res){
   // var string = req.body.toString();
   // var content = string.replace(/:/g, "\:");
 
-  var content = req.body.toString();
-  // console.log(req.body);
-  database.ref(url).update({ content: content });
-  // database.ref(url).update({content: "content goes here?"});
-  // console.log(req);
+  var content = req.body;
+  database.ref(url).update(content);
+  // console.log({ content: req.body });
+  res.json(req.body);
 });
 
 var access_token;

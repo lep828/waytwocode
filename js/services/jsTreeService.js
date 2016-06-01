@@ -59,13 +59,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
-    var postData = {
-      'core' : {
-        'data' : jsTreeData
-        }
-      };
+    var postData = { 'core' : { 'data' : jsTreeData } };
 
-      FirebaseService.addData(postData);
+    FirebaseService.addData(postData);
 
     // $.ajax({
     //   url: "/add",
@@ -75,11 +71,11 @@ function jsTreeService(CodeMirrorService, FirebaseService){
     //   console.log(res);
     // });
 
-    $.ajax({
-      url: "/get"
-    }).done(function(res){
-      console.log(res);
-    });
+    // $.ajax({
+    //   url: "/get"
+    // }).done(function(res){
+    //   console.log(res);
+    // });
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');

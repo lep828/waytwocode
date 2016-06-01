@@ -13,7 +13,9 @@ function CodeMirrorService(FirebaseService){
       url: raw
     }).done(function(response){
 
-      var data = response.replace(/:/g, "\:");
+      // var data = response.replace(/:/g, "\:");
+      var data = {data: btoa(response)};
+      // console.log(data);
       FirebaseService.updateNode(node, data);
 
       // $.ajax({
