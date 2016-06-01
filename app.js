@@ -57,10 +57,14 @@ app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.post("/add", function(req, res){
-  var newPostKey = database.ref("/").push().key;
-  database.ref("/" + newPostKey).update(req.body);
-  res.json({ key: newPostKey });
+app.post("/add/:key", function(req, res){
+  // var newPostKey = database.ref("/").push().key;
+  // database.ref("/" + newPostKey).update(req.body);
+  // res.json({ key: newPostKey });
+
+  var key = req.params.key;
+  database.ref("/" + key).update(req.body);
+  res.json({ key: key });
 });
 
 app.get("/get", function(req, res){
@@ -74,6 +78,11 @@ app.post("/update/:key/:id", function(req, res){
   var url = req.params.key + "/core/data/" + req.params.id;
   database.ref(url).update(req.body);
   res.json(req.body);
+});
+
+app.get("/key", function(req, res){
+  var key = database.ref("/").push().key;
+  res.json({ key: key });
 });
 
 var access_token;

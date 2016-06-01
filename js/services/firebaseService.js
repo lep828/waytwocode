@@ -6,8 +6,18 @@ FirebaseService.$inject = ["$state"];
 function FirebaseService($state){
   var self = this;
 
-  self.addData = addData;
+  self.addData    = addData;
   self.updateNode = updateNode;
+  self.createKey  = createKey;
+
+  function createKey(){
+    $.ajax({
+      url: "/key"
+    }).done(function(res){
+      console.log(res.key);
+      self.key = res.key;
+    });
+  }
 
   function updateNode(node, data){
     $.ajax({
@@ -22,12 +32,13 @@ function FirebaseService($state){
 
   function addData(data){
     $.ajax({
-      url: "/add",
+      url: "/add/" + self.key,
       method: "POST",
       data: data
     }).done(function(res){
-      self.key = res.key;
-      $state.go("code", { key: self.key });
+      console.log(res);
+      // self.key = res.key;
+      // $state.go("code", { key: res.key });
     });
   }
 }

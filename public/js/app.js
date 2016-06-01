@@ -67647,8 +67647,18 @@ FirebaseService.$inject = ["$state"];
 function FirebaseService($state){
   var self = this;
 
-  self.addData = addData;
+  self.addData    = addData;
   self.updateNode = updateNode;
+  self.createKey  = createKey;
+
+  function createKey(){
+    $.ajax({
+      url: "/key"
+    }).done(function(res){
+      console.log(res.key);
+      self.key = res.key;
+    });
+  }
 
   function updateNode(node, data){
     $.ajax({
@@ -67663,12 +67673,13 @@ function FirebaseService($state){
 
   function addData(data){
     $.ajax({
-      url: "/add",
+      url: "/add/" + self.key,
       method: "POST",
       data: data
     }).done(function(res){
-      self.key = res.key;
-      $state.go("code", { key: self.key });
+      console.log(res);
+      // self.key = res.key;
+      // $state.go("code", { key: res.key });
     });
   }
 }
@@ -67727,13 +67738,15 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService"];
-function jsTreeService(CodeMirrorService, FirebaseService){
-  var self = this;
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state"];
+function jsTreeService(CodeMirrorService, FirebaseService, $state){
+  FirebaseService.createKey();
 
+  var self = this;
   self.getSha = getSha;
 
   function getSha(repo, token, user){
+    $state.go("code", { key: FirebaseService.key });
     self.user = user;
     $.ajax({
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
@@ -67788,10 +67801,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
+
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data);
-
-
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');

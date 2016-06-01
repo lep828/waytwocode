@@ -2,13 +2,15 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService"];
-function jsTreeService(CodeMirrorService, FirebaseService){
-  var self = this;
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state"];
+function jsTreeService(CodeMirrorService, FirebaseService, $state){
+  FirebaseService.createKey();
 
+  var self = this;
   self.getSha = getSha;
 
   function getSha(repo, token, user){
+    $state.go("code", { key: FirebaseService.key });
     self.user = user;
     $.ajax({
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
@@ -63,10 +65,9 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       return treeData;
     });
 
+
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data);
-
-
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var path = data.instance.get_path(data.node,'/');
