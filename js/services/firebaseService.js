@@ -14,7 +14,8 @@ function FirebaseService(){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
+      // console.log(atob(res.content));
+      console.log("got stuff");
     });
   }
 

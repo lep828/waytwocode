@@ -53,6 +53,7 @@ function jsTreeService(CodeMirrorService, FirebaseService){
           var parentPath = tempParent.join("/");
           // console.log(node.path, parentPath, treeParents[parentPath]);
           treeData.parent = treeParents[parentPath];
+          treeData.type = "file";
         }
       // console.log(treeData);
 
@@ -88,6 +89,16 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       CodeMirrorService.init(raw, path, node);
     }).jstree({ 'core' : {
       'data' : jsTreeData
-    } });
+    },
+    "types" : {
+      "default" : {
+        "icon" : "glyphicon glyphicon-folder-open"
+      },
+      "file" : {
+        "icon" : "glyphicon glyphicon-file"
+      }
+    },
+    "plugins" : ["types"]
+   });
   }
 }

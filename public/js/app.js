@@ -67582,7 +67582,7 @@ function CodeMirrorService(FirebaseService){
     }).done(function(response){
 
       // var data = response.replace(/:/g, "\:");
-      var data = {data: btoa(response)};
+      var data = { content: btoa(response)};
       // console.log(data);
       FirebaseService.updateNode(node, data);
 
@@ -67660,7 +67660,8 @@ function FirebaseService(){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
+      // console.log(atob(res.content));
+      console.log("got stuff");
     });
   }
 
@@ -67768,6 +67769,7 @@ function jsTreeService(CodeMirrorService, FirebaseService){
           var parentPath = tempParent.join("/");
           // console.log(node.path, parentPath, treeParents[parentPath]);
           treeData.parent = treeParents[parentPath];
+          treeData.type = "file";
         }
       // console.log(treeData);
 
@@ -67803,6 +67805,16 @@ function jsTreeService(CodeMirrorService, FirebaseService){
       CodeMirrorService.init(raw, path, node);
     }).jstree({ 'core' : {
       'data' : jsTreeData
-    } });
+    },
+    "types" : {
+      "default" : {
+        "icon" : "glyphicon glyphicon-folder-open"
+      },
+      "file" : {
+        "icon" : "glyphicon glyphicon-file"
+      }
+    },
+    "plugins" : ["types"]
+   });
   }
 }
