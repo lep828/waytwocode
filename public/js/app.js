@@ -69321,6 +69321,7 @@ angular
 MainController.$inject = ['GithubService'];
 function MainController(GithubService){
   var self = this;
+  self.repos = GithubService.repos;
 
   $("#repositories").on("click", function(){
     GithubService.start();
@@ -69458,7 +69459,8 @@ GithubService.$inject = ["jsTreeService"];
 function GithubService(jsTreeService){
   var self = this;
 
-  self.start    = getToken;
+  self.start = getToken;
+  self.repos = [];
 
   function getToken(){
     $.ajax({
@@ -69478,12 +69480,21 @@ function GithubService(jsTreeService){
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
       console.log(res);
-        $("#repos").empty();
+        $("#card-deck").empty();
       res.forEach(function(repo){
-        $("#repos").append("<li>" + repo.full_name + "</li>");
+        $("#card-deck").append(
+        '<div class="card" id='+repo.full_name+'>'+
+          '<div class="card-block">'+
+            '<h4 class="card-title">'+repo.name+'</h4>'+
+            '<p class="card-text">'+repo.description+'</p>'+
+          '</div>'+
+        '</div>');
+        // $("#repos").append("<li>" + repo.full_name + "</li>");
       });
-      $("#repos").delegate("li", "click", function(event){
-        var repo = event.target.innerHTML;
+
+      $(".card").on("click", function(event){
+        console.log(event.currentTarget.id);
+        var repo = event.currentTarget.id;
         jsTreeService.getSha(repo, token);
       });
     });
@@ -69575,10 +69586,10 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
     },
     "types" : {
       "folder" : {
-        "icon" : "glyphicon glyphicon-folder-open"
+        "icon" : "/images/folder.png"
       },
       "file" : {
-        "icon" : "glyphicon glyphicon-file"
+        "icon" : "/images/file.png"
       }
     },
     "plugins" : ["types"]

@@ -83,10 +83,10 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
     },
     "types" : {
       "folder" : {
-        "icon" : "glyphicon glyphicon-folder-open"
+        "icon" : "/images/folder.png"
       },
       "file" : {
-        "icon" : "glyphicon glyphicon-file"
+        "icon" : "/images/file.png"
       }
     },
     "plugins" : ["types"]
