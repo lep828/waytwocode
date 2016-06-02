@@ -36,7 +36,7 @@ function FirebaseService($state){
       data: data
     }).done(function(res){
       // console.log(atob(res.content));
-      console.log("updated stuff");
+      console.log("updated node in firebase");
     });
   }
 
@@ -46,9 +46,8 @@ function FirebaseService($state){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
-      // self.key = res.key;
-      // $state.go("code", { key: res.key });
+      console.log("added to firebase");
+      // console.log("this", res);
     });
   }
 }

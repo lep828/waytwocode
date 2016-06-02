@@ -6,12 +6,21 @@ MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService']
 function MainController(GithubService, CodeMirrorService, jsTreeService){
   var self = this;
   self.repos = GithubService.repos;
+  self.commitForm = commitForm;
+  self.commit = {};
 
-  $("#test").on("click", function(){
-    if (!jsTreeService.sha) return false;
-    var data = CodeMirrorService.getValue();
-    GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
-  });
+  function commitForm(){
+
+    var message  = self.commit.message;
+    var data     = CodeMirrorService.getValue();
+    var filePath = CodeMirrorService.filePath;
+    GithubService.makeCommit(filePath, data, message);
+  }
+
+  // $("#commitForm").on("submit", function(){
+  //   var data = CodeMirrorService.getValue();
+  //   GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
+  // });
 
   $("#repositories").on("click", function(){
     GithubService.start();

@@ -6,11 +6,15 @@ CodeMirrorService.$inject = ["FirebaseService"];
 function CodeMirrorService(FirebaseService){
   var self = this;
 
+
   self.init = init;
   self.getValue = getValue;
   self.myCodeMirror = {};
 
-  function init(raw, path, node) {
+  function init(raw, file, node, filePath) {
+    self.filePath = filePath;
+
+    console.log(filePath);
     $.ajax({
       url: raw
     }).done(function(response){
@@ -18,7 +22,7 @@ function CodeMirrorService(FirebaseService){
       FirebaseService.updateNode(node, data);
 
       var mode;
-      switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
+      switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
         case ".html":
           mode = "xml";
           break;
@@ -65,6 +69,7 @@ function CodeMirrorService(FirebaseService){
   }
 
   function getValue(){
+    console.log(self.myCodeMirror);
     return btoa(self.myCodeMirror.getValue());
   }
 }

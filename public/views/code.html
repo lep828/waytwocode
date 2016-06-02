@@ -6,3 +6,18 @@
     <div id="editor"></div>
   </div>
 </div>
+
+<!-- <button class="btn btn-primary" data-toggle="modal" data-target=".commit-modal">Commit</button> -->
+
+<div class="modal fade commit-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form ng-submit="main.commitForm()">
+        <fieldset class="form-group">
+          <label for="commitMessage">Commit Message</label>
+          <input type="text" class="form-control" id="commitMessage" ng-model="main.commit.message" placeholder="What did you do?!?!?!?">
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

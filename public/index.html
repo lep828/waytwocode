@@ -2,7 +2,7 @@
 <html ng-app="PairProgramming">
 <head>
   <meta charset="utf-8">
-  <title>PearCoders</title>
+  <title>WayTwoCode</title>
   <script src="js/app.min.js"></script>
   <link rel="stylesheet" href="css/style.min.css">
   <base href="/">
@@ -10,7 +10,7 @@
 <body ng-controller="MainController as main">
   <header>
     <nav class="navbar navbar-dark bg-inverse">
-      <a class="navbar-brand" href="/">PearCoders</a>
+      <a class="navbar-brand" href="/">WayTwoCode</a>
       <ul class="nav navbar-nav pull-xs-right">
         <li class="nav-item">
           <a class="nav-link" href="/repositories" id="repositories">Select a repository</a>
@@ -19,7 +19,8 @@
           <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=e28a001aa9eecc8286f6&redirect_uri=http://localhost:3000/github&scope=repo" id="githubLogin">Login with Github</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="test" href="#">test</a>
+          <!-- <a id="commit" role="button" class="nav-link" href="#">Commit!</a> -->
+          <a id="commit" class="nav-link" data-toggle="modal" data-target=".commit-modal">Commit</a>
         </li>
       </ul>
     </nav>

@@ -69322,12 +69322,21 @@ MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService']
 function MainController(GithubService, CodeMirrorService, jsTreeService){
   var self = this;
   self.repos = GithubService.repos;
+  self.commitForm = commitForm;
+  self.commit = {};
 
-  $("#test").on("click", function(){
-    if (!jsTreeService.sha) return false;
-    var data = CodeMirrorService.getValue();
-    GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
-  });
+  function commitForm(){
+
+    var message  = self.commit.message;
+    var data     = CodeMirrorService.getValue();
+    var filePath = CodeMirrorService.filePath;
+    GithubService.makeCommit(filePath, data, message);
+  }
+
+  // $("#commitForm").on("submit", function(){
+  //   var data = CodeMirrorService.getValue();
+  //   GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
+  // });
 
   $("#repositories").on("click", function(){
     GithubService.start();
@@ -69344,11 +69353,15 @@ CodeMirrorService.$inject = ["FirebaseService"];
 function CodeMirrorService(FirebaseService){
   var self = this;
 
+
   self.init = init;
   self.getValue = getValue;
   self.myCodeMirror = {};
 
-  function init(raw, path, node) {
+  function init(raw, file, node, filePath) {
+    self.filePath = filePath;
+
+    console.log(filePath);
     $.ajax({
       url: raw
     }).done(function(response){
@@ -69356,7 +69369,7 @@ function CodeMirrorService(FirebaseService){
       FirebaseService.updateNode(node, data);
 
       var mode;
-      switch (path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
+      switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
         case ".html":
           mode = "xml";
           break;
@@ -69403,6 +69416,7 @@ function CodeMirrorService(FirebaseService){
   }
 
   function getValue(){
+    console.log(self.myCodeMirror);
     return btoa(self.myCodeMirror.getValue());
   }
 }
@@ -69445,7 +69459,7 @@ function FirebaseService($state){
       data: data
     }).done(function(res){
       // console.log(atob(res.content));
-      console.log("updated stuff");
+      console.log("updated node in firebase");
     });
   }
 
@@ -69455,9 +69469,8 @@ function FirebaseService($state){
       method: "POST",
       data: data
     }).done(function(res){
-      console.log(res);
-      // self.key = res.key;
-      // $state.go("code", { key: res.key });
+      console.log("added to firebase");
+      // console.log("this", res);
     });
   }
 }
@@ -69470,10 +69483,10 @@ GithubService.$inject = ["jsTreeService", "$http"];
 function GithubService(jsTreeService, $http){
   var self = this;
 
-  self.start = getToken;
-  self.repos = [];
+  self.start      = getToken;
+  self.repos      = [];
   self.makeCommit = makeCommit;
-  self.putCommit = putCommit;
+  self.putCommit  = putCommit;
 
   function getToken(){
     $.ajax({
@@ -69483,7 +69496,7 @@ function GithubService(jsTreeService, $http){
       var token = res.token;
       if(!token) return false;
       $("#githubLogin").hide();
-      console.log(token);
+      // console.log(token);
       self.token = token;
       getRepo(token);
     });
@@ -69508,32 +69521,34 @@ function GithubService(jsTreeService, $http){
       });
 
       $(".card").on("click", function(event){
-        console.log(event.currentTarget.id);
+        // console.log(event.currentTarget.id);
         var repo = event.currentTarget.id;
+        self.repo = repo;
         jsTreeService.getSha(repo, token);
       });
     });
   }
 
-  function makeCommit(repo, owner, path, content) {
-    var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
+  function makeCommit(filePath, content, message) {
+    // var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
+    var url = "https://api.github.com/repos/"+self.repo+"/contents/"+filePath;
     return $http.get(url)
       .then(function(response) {
-        console.log(response.data.sha);
+        // console.log(response.data.sha);
         var sha = response.data.sha;
-        return putCommit(path, content, sha, url);
+        return putCommit(filePath, content, sha, url, message);
       });
   }
 
-  function putCommit(path, content, sha, url){
+  function putCommit(filePath, content, sha, url, message){
     var data = {
-      message: "commit message",
+      message: message,
       content: content,
       sha: sha,
     };
     var config = {
       params: {
-        path: path,
+        path: filePath,
         access_token: self.token
       }
     };
@@ -69556,11 +69571,14 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
   function getSha(repo, token){
     $state.go("code", { key: FirebaseService.key });
+
+    $("#commit").css("display", "block");
+
     $.ajax({
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      console.log("First response", response);
+      // console.log("First response", response);
       var sha = response.data.object.sha;
       self.sha = sha;
       getTree(repo, token, sha);
@@ -69572,7 +69590,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      console.log("Second response", response);
+      // console.log("Second response", response);
       var tree  = response.data.tree;
       buildTree(repo, tree);
     });
@@ -69587,25 +69605,20 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
-      var path       = parent[parent.length-1];
       var treeData   = {};
 
-      if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
-       treeData.type = "folder";
-     } else {
-       treeData.type = "file";
-     }
+      treeData.id       = treeParents[parent.join("/")];
+      treeData.type     = node.type === "tree" ? "folder" : "file";
+      treeData.text     = parent.length === 1 ? node.path : parent[parent.length-1];
+      treeData.filePath = node.path;
+      treeData.parent   = "#";
 
-      treeData.id     = treeParents[parent.join("/")];
-      treeData.text   = parent.length === 1 ? node.path : parent[parent.length-1];
-      treeData.parent = "#";
-
-        if (parent.length > 1) {
-          var tempParent = node.path.split("/");
-          tempParent.pop();
-          var parentPath = tempParent.join("/");
-          treeData.parent = treeParents[parentPath];
-        }
+      if (parent.length > 1) {
+        var tempParent = node.path.split("/");
+        tempParent.pop();
+        var parentPath = tempParent.join("/");
+        treeData.parent = treeParents[parentPath];
+      }
 
       return treeData;
     });
@@ -69615,13 +69628,14 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
     // FirebaseService.getData(FirebaseService.key);
 
     $('#jstree').on('select_node.jstree', function (e, data) {
-      var path = data.instance.get_path(data.node,'/');
-      if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
+      var file = data.instance.get_path(data.node,'/');
+      if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      var raw  = "https://raw.githubusercontent.com/" + repo + "/master/" + path;
-      var node = data.instance._data.core.selected[0];
+      var raw      = "https://raw.githubusercontent.com/" + repo + "/master/" + file;
+      var node     = data.node.id;
+      var filePath = data.node.original.filePath;
 
-      CodeMirrorService.init(raw, path, node);
+      CodeMirrorService.init(raw, file, node, filePath);
     }).jstree({
     "core" : {
       "data" : jsTreeData

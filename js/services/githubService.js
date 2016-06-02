@@ -6,10 +6,10 @@ GithubService.$inject = ["jsTreeService", "$http"];
 function GithubService(jsTreeService, $http){
   var self = this;
 
-  self.start = getToken;
-  self.repos = [];
+  self.start      = getToken;
+  self.repos      = [];
   self.makeCommit = makeCommit;
-  self.putCommit = putCommit;
+  self.putCommit  = putCommit;
 
   function getToken(){
     $.ajax({
@@ -19,7 +19,7 @@ function GithubService(jsTreeService, $http){
       var token = res.token;
       if(!token) return false;
       $("#githubLogin").hide();
-      console.log(token);
+      // console.log(token);
       self.token = token;
       getRepo(token);
     });
@@ -44,32 +44,34 @@ function GithubService(jsTreeService, $http){
       });
 
       $(".card").on("click", function(event){
-        console.log(event.currentTarget.id);
+        // console.log(event.currentTarget.id);
         var repo = event.currentTarget.id;
+        self.repo = repo;
         jsTreeService.getSha(repo, token);
       });
     });
   }
 
-  function makeCommit(repo, owner, path, content) {
-    var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
+  function makeCommit(filePath, content, message) {
+    // var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
+    var url = "https://api.github.com/repos/"+self.repo+"/contents/"+filePath;
     return $http.get(url)
       .then(function(response) {
-        console.log(response.data.sha);
+        // console.log(response.data.sha);
         var sha = response.data.sha;
-        return putCommit(path, content, sha, url);
+        return putCommit(filePath, content, sha, url, message);
       });
   }
 
-  function putCommit(path, content, sha, url){
+  function putCommit(filePath, content, sha, url, message){
     var data = {
-      message: "commit message",
+      message: message,
       content: content,
       sha: sha,
     };
     var config = {
       params: {
-        path: path,
+        path: filePath,
         access_token: self.token
       }
     };

@@ -7747,6 +7747,7 @@ html, body {
 }
 
 .left #jstree {
+  margin-top: 20px;
   height: 100vh;
 }
 
@@ -7758,7 +7759,11 @@ html, body {
 
 #editor {
   height: inherit;
-  width: 100vh;
+  width: 100%;
+}
+
+#commit {
+  display: none;
 }
 
 .CodeMirror {
