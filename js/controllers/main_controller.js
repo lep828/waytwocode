@@ -2,12 +2,23 @@ angular
   .module("PairProgramming")
   .controller("MainController", MainController);
 
-MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService'];
-function MainController(GithubService, CodeMirrorService, jsTreeService){
-  var self = this;
-  self.repos = GithubService.repos;
+MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService', '$firebaseObject', '$stateParams'];
+function MainController(GithubService, CodeMirrorService, jsTreeService, $firebaseObject, $stateParams){
+  var self        = this;
+  self.repos      = GithubService.repos;
   self.commitForm = commitForm;
-  self.commit = {};
+  self.commit     = {};
+
+  var ref = firebase.database().ref();
+  // console.log(ref);
+
+  self.data = $firebaseObject(ref);
+  // console.log(self.data);
+
+  ref.on('value', function(data){
+    console.log("something happened!");
+    console.log(self.data);
+  });
 
   function commitForm(){
     var message  = self.commit.message;

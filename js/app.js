@@ -1,5 +1,5 @@
 angular
-  .module("PairProgramming", ["ui.router", "ngResource"])
+  .module("PairProgramming", ["ui.router", "ngResource", "firebase"])
   .config(MainRouter);
 
 MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
@@ -17,7 +17,9 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
     })
     .state("code", {
       url: "/code/:key",
-      templateUrl: "views/code.html"
+      templateUrl: "views/code.html",
+      controller: "MainController",
+      controllerAs: "main"
     });
 
   $urlRouterProvider.otherwise("/");

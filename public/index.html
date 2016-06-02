@@ -5,6 +5,13 @@
   <title>WayTwoCode</title>
   <link rel="stylesheet" href="css/style.min.css">
   <script src="js/app.min.js"></script>
+  <script>
+    var config = {
+      apiKey: 'AIzaSyAN2XzmSlcASStAL3Nu9izmP8pFY1cy1JQ',
+      databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
+    };
+    firebase.initializeApp(config);
+  </script>
   <base href="/">
 </head>
 <body ng-controller="MainController as main">
@@ -14,9 +21,6 @@
       <ul class="nav navbar-nav pull-xs-right">
         <li class="nav-item">
           <a class="nav-link" href="/repositories" id="repositories">Select a repository</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/login/oauth/authorize?client_id=e28a001aa9eecc8286f6&redirect_uri=http://localhost:3000/github&scope=repo" id="githubLogin">Login with Github</a>
         </li>
         <li class="nav-item">
           <a id="commit" class="nav-link" data-toggle="modal" data-target=".commit-modal">Commit</a>

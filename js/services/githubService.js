@@ -7,9 +7,9 @@ function GithubService(jsTreeService, $http){
   var self = this;
 
   self.start      = getToken;
-  self.repos      = [];
   self.makeCommit = makeCommit;
   self.putCommit  = putCommit;
+  self.repos = [];
 
   function getToken(){
     $http.get('http://localhost:3000/token').then(function(res){
@@ -17,14 +17,15 @@ function GithubService(jsTreeService, $http){
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
-      getRepo(token);
+      getRepos(token);
     });
   }
 
-  function getRepo(token){
+  function getRepos(token){
     $http.get("https://api.github.com/user/repos?access_token=" + token)
       .then(function(res){
         res.data.forEach(function(repo){
+          // self.repos = res.data;
           self.repos.push(repo);
         });
 

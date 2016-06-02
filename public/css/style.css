@@ -7820,6 +7820,14 @@ html, body {
   font-family: Lato;
 }
 
+.navbar {
+  background: #1B1D1E;
+}
+
+.navbar .nav .nav-item .nav-link {
+  color: #f8f8f8;
+}
+
 .intro-message {
   background: url("/images/landing.jpg") no-repeat center center;
   background-size: cover;
@@ -7833,13 +7841,13 @@ html, body {
 
 .intro-message h1 {
   margin: 0;
-  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
+  text-shadow: 5px 5px 6px rgba(0, 0, 0, 0.6);
   font-size: 4.5em;
 }
 
 .intro-message h3 {
-  margin-top: 10px;
-  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.6);
+  margin-top: 50px;
+  text-shadow: 5px 5px 6px rgba(0, 0, 0, 0.6);
 }
 
 .intro-message .intro-divider {
@@ -7885,6 +7893,5 @@ html, body {
 }
 
 .CodeMirror {
-  border: 1px solid #eee;
   height: 100vh;
 }

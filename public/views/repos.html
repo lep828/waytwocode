@@ -1,16 +1,18 @@
-<div class="row">
-  <div class="col-md-6">
-    <h1>Your Repositories</h1>
-    <div class="card">
-      <ul class="list-group list-group-flush" id="list-group">
-        <li ng-repeat="repo in main.repos" class="list-group-item" id="{{ repo.full_name }}">
-          {{ repo.name }}
-        </li>
-      </ul>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h1>Your Repositories</h1>
+      <div class="card">
+        <ul class="list-group list-group-flush" id="list-group">
+          <li ng-repeat="repo in main.repos" class="list-group-item" id="{{ repo.full_name }}">
+            {{ repo.name }}
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <div class="col-md-6">
-    <h1>Have a key?</h1>
-    Use a key to get a repo
+    <div class="col-md-6">
+      <h1>Have a key?</h1>
+      Use a key to get a repo
+    </div>
   </div>
 </div>
