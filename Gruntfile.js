@@ -53,6 +53,7 @@ module.exports = function(grunt) {
           'bower_components/codemirror/mode/scss/scss.js',
           'bower_components/codemirror/mode/xml/xml.js',
           'bower_components/codemirror/addon/edit/closebrackets.js',
+          'bower_components/codemirror/addon/scroll/simplescrollbars.js',
           'js/app.js',
           'js/**/*.js'
         ],
@@ -61,6 +62,7 @@ module.exports = function(grunt) {
       scssDist: {
         src: [
           'scss/_bower.scss',
+          'bower_components/codemirror/addon/scroll/simplescrollbars.css',
           'scss/style.scss'
         ],
         dest: 'scss/build.scss'

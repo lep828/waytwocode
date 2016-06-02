@@ -64,7 +64,8 @@ function CodeMirrorService(FirebaseService){
         mode:  mode,
         viewportMargin: Infinity,
         theme: "monokai",
-        autoCloseBrackets: true
+        autoCloseBrackets: true,
+        scrollbarStyle: "overlay"
       });
     });
   }
