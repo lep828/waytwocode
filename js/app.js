@@ -1,5 +1,5 @@
 angular
-  .module("PairProgramming", ["ui.router", "ngResource", "firebase"])
+  .module("PairProgramming", ["ui.router", "firebase"])
   .config(MainRouter);
 
 MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];

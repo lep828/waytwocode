@@ -7829,6 +7829,11 @@ html, body {
   color: #f8f8f8;
 }
 
+h1 {
+  text-align: center;
+  margin: 20px 0;
+}
+
 .intro-message {
   background: url("/images/landing.jpg") no-repeat center center;
   background-size: cover;
@@ -7860,6 +7865,11 @@ html, body {
 
 .intro-message #githubLogin {
   margin-top: 25px;
+}
+
+.repoLogin {
+  margin-top: 50px;
+  text-align: center;
 }
 
 .left {
@@ -7897,4 +7907,5 @@ html, body {
 
 .CodeMirror .CodeMirror-gutter {
   padding-right: 5px;
+  background-color: #34362e;
 }

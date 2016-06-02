@@ -24,6 +24,11 @@ html, body {
   }
 }
 
+h1 {
+  text-align: center;
+  margin: 20px 0;
+}
+
 .intro-message{
   background: url('/images/landing.jpg') no-repeat center center;
   background-size: cover;
@@ -53,6 +58,11 @@ html, body {
     margin-top: 25px;
     // background-color: #f8f8f8;
   }
+}
+
+.repoLogin {
+  margin-top: 50px;
+  text-align: center;
 }
 
 .left {
@@ -89,5 +99,6 @@ html, body {
   height: 100vh;
   .CodeMirror-gutter{
     padding-right: 5px;
+    background-color: lighten(#272822, 5%);
   }
 }

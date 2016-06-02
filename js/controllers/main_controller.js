@@ -10,21 +10,20 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   self.commit     = {};
 
   var ref = firebase.database().ref();
-  // console.log(ref);
-
   self.data = $firebaseObject(ref);
-  // console.log(self.data);
 
   ref.on('value', function(data){
-    console.log(self.data);
     if (!$stateParams.key) return false;
     var key = $stateParams.key;
-    console.log(self.data[key], "here");
+    console.log(key);
+    console.log(self.data);
+    console.log("here", self.data[key]);
   });
 
   function commitForm(){
     var message  = self.commit.message;
     var data     = CodeMirrorService.getValue();
+    console.log(data);
     var filePath = CodeMirrorService.filePath;
     GithubService.makeCommit(filePath, data, message);
   }

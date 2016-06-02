@@ -3,15 +3,8 @@ var app            = express();
 var config         = require("./config/config");
 var bodyParser     = require("body-parser");
 var morgan         = require("morgan");
-// var methodOverride = require("method-override");
-// var mongoose       = require("mongoose");
-// var passport       = require("passport");
-// var expressJWT     = require("express-jwt");
-// var cors           = require("cors");
 var rp             = require("request-promise");
 var firebase       = require("firebase");
-
-// mongoose.connect(config.database);
 
 // firebase.initializeApp({
 //   serviceAccount: {
@@ -34,14 +27,6 @@ var database = firebase.database();
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(methodOverride(function(req, res){
-//   if (req.body && typeof req.body === "object" && "_method" in req.body){
-//     var method = req.body._method;
-//     delete req.body._method;
-//     return method;
-//   }
-// }));
-// app.use(cors());
 
 app.use("/", express.static(__dirname + "/public"));
 
@@ -96,7 +81,9 @@ app.get("/token", function(req, res){
 });
 
 app.get("/*", function(req, res){
-  res.redirect("/");
+  console.log("oi", req.params[0]);
+  // res.redirect("/");
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 app.listen(config.port, function(){
