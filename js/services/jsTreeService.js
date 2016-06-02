@@ -61,7 +61,6 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data);
-    // FirebaseService.getData(FirebaseService.key);
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var file = data.instance.get_path(data.node,'/');

@@ -16,8 +16,10 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   // console.log(self.data);
 
   ref.on('value', function(data){
-    console.log("something happened!");
     console.log(self.data);
+    if (!$stateParams.key) return false;
+    var key = $stateParams.key;
+    console.log(self.data[key], "here");
   });
 
   function commitForm(){

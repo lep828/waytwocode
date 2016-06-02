@@ -71944,8 +71944,8 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
     .state("code", {
       url: "/code/:key",
       templateUrl: "views/code.html",
-      controller: "MainController",
-      controllerAs: "main"
+      // controller: "MainController",
+      // controllerAs: "main"
     });
 
   $urlRouterProvider.otherwise("/");
@@ -71969,8 +71969,10 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   // console.log(self.data);
 
   ref.on('value', function(data){
-    console.log("something happened!");
     console.log(self.data);
+    if (!$stateParams.key) return false;
+    var key = $stateParams.key;
+    console.log(self.data[key], "here");
   });
 
   function commitForm(){
@@ -72234,7 +72236,6 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data);
-    // FirebaseService.getData(FirebaseService.key);
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var file = data.instance.get_path(data.node,'/');
