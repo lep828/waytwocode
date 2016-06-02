@@ -52,6 +52,7 @@ module.exports = function(grunt) {
           'bower_components/codemirror/mode/sass/sass.js',
           'bower_components/codemirror/mode/scss/scss.js',
           'bower_components/codemirror/mode/xml/xml.js',
+          'bower_components/codemirror/addon/edit/closebrackets.js',
           'js/app.js',
           'js/**/*.js'
         ],

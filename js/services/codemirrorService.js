@@ -63,7 +63,8 @@ function CodeMirrorService(FirebaseService){
         value: response,
         mode:  mode,
         viewportMargin: Infinity,
-        theme: "monokai"
+        theme: "monokai",
+        autoCloseBrackets: true
       });
     });
   }
