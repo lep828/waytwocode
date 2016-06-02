@@ -7894,7 +7894,9 @@ h1 {
 }
 
 #commit {
-  display: none;
+  position: absolute;
+  bottom: 10%;
+  left: 40%;
 }
 
 #commitForm {

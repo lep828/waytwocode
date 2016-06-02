@@ -71232,12 +71232,13 @@ CodeMirrorService.$inject = ["FirebaseService", "$http"];
 function CodeMirrorService(FirebaseService, $http){
   var self = this;
 
-  self.init = init;
+  self.changeFile = changeFile;
   self.getValue = getValue;
-  self.myCodeMirror = {};
+  // self.myCodeMirror = {};
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
+    // $("#editor").empty();
     self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
       lineNumbers: true,
       lineWrapping: true,
@@ -71251,7 +71252,7 @@ function CodeMirrorService(FirebaseService, $http){
     });
   }
 
-  function init(raw, file, node, filePath) {
+  function changeFile(raw, file, node, filePath) {
     self.filePath = filePath;
     $http.get(raw).then(function(res){
       var data = { content: btoa(res.data) };
@@ -71481,9 +71482,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
     buildTree(data);
   }
 
-    function buildTree(content){
-      console.log(content, "data");
-
+  function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
@@ -71492,17 +71491,18 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
       var node     = data.node.id;
       var filePath = data.node.original.filePath;
 
-      CodeMirrorService.init(raw, file, node, filePath);
-    }).jstree({ "core": content.core }, {
-    "types" : {
-      "folder" : {
-        "icon" : "/images/folder.png"
+      CodeMirrorService.changeFile(raw, file, node, filePath);
+
+    }).jstree({ "core": content.core },
+    { "types" : {
+        "folder" : {
+          "icon" : "/images/folder.png"
+        },
+        "file" : {
+          "icon" : "/images/file.png"
+        }
       },
-      "file" : {
-        "icon" : "/images/file.png"
-      }
-    },
-    "plugins" : ["types"]
-   });
+      "plugins" : ["types"]
+    });
   }
 }

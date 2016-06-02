@@ -6,12 +6,13 @@ CodeMirrorService.$inject = ["FirebaseService", "$http"];
 function CodeMirrorService(FirebaseService, $http){
   var self = this;
 
-  self.init = init;
+  self.changeFile = changeFile;
   self.getValue = getValue;
-  self.myCodeMirror = {};
+  // self.myCodeMirror = {};
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
+    // $("#editor").empty();
     self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
       lineNumbers: true,
       lineWrapping: true,
@@ -25,7 +26,7 @@ function CodeMirrorService(FirebaseService, $http){
     });
   }
 
-  function init(raw, file, node, filePath) {
+  function changeFile(raw, file, node, filePath) {
     self.filePath = filePath;
     $http.get(raw).then(function(res){
       var data = { content: btoa(res.data) };
