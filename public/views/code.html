@@ -12,7 +12,7 @@
 <div class="modal fade commit-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form ng-submit="main.commitForm()">
+      <form ng-submit="main.commitForm()" id="commitForm">
         <fieldset class="form-group">
           <label for="commitMessage">Commit Message</label>
           <input type="text" class="form-control" id="commitMessage" ng-model="main.commit.message" placeholder="What did you do?!?!?!?">

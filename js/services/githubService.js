@@ -31,20 +31,25 @@ function GithubService(jsTreeService, $http){
     }).done(function(res){
       $("#card-deck").empty();
       res.forEach(function(repo){
-        $("#card-deck").append(
-          // '<div class="col-md-4">'+
-            '<div class="card" id='+ repo.full_name +'>'+
-              '<div class="card-block">'+
-                '<h4 class="card-title">'+ repo.name +'</h4>'+
-                '<p class="card-text">'+ repo.description +'</p>'+
-              '</div>'+
-            // '</div>'+
-          '</div>'
+        // $("#card-deck").append(
+        //   '<div class="col-md-4">'+
+        //     '<div class="card" id='+ repo.full_name +'>'+
+        //       '<div class="card-block">'+
+        //         '<h4 class="card-title">'+ repo.name +'</h4>'+
+        //         '<p class="card-text">'+ repo.description +'</p>'+
+        //       '</div>'+
+        //     '</div>'+
+        //   '</div>'
+        // );
+        $("#list-group").append(
+          '<li class="list-group-item" id='+repo.full_name+'>'+
+            repo.name +
+          '</li>'
         );
       });
 
-      $(".card").on("click", function(event){
-        // console.log(event.currentTarget.id);
+      $(".list-group-item").on("click", function(event){
+        console.log(event.currentTarget.id);
         var repo = event.currentTarget.id;
         self.repo = repo;
         jsTreeService.getSha(repo, token);
