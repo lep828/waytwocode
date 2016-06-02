@@ -6,33 +6,36 @@ jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$htt
 function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
   FirebaseService.createKey();
 
-  var self = this;
-  self.getSha = getSha;
+  var self       = this;
+
+  self.getSha    = getSha;
+  self.buildTree = buildTree;
 
   function getSha(repo, token){
     $state.go("code", { key: FirebaseService.key });
-
+    self.repo = repo;
     $("#commit").css("display", "block");
 
-    var url = "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token;
+    var url = "https://api.github.com/repos/" + self.repo + "/git/refs/heads/master?access_token=" + token;
     $http.get(url).then(function(res){
       CodeMirrorService.createCodeMirror();
       // console.log("First response", res);
       var sha = res.data.object.sha;
       self.sha = sha;
-      getTree(repo, token, sha);
+      getTree(token);
     });
   }
 
-  function getTree(repo, token, sha){
-    var url = "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token;
+  function getTree(token){
+    var url = "https://api.github.com/repos/" + self.repo + "/git/trees/" + self.sha + "?recursive=1&access_token=" + token;
     $http.get(url).then(function(res){
       var tree  = res.data.tree;
-      buildTree(repo, tree);
+      // console.log(tree);
+      structureTree(tree);
     });
   }
 
-  function buildTree(repo, tree){
+  function structureTree(tree){
     var treeParents = {};
 
     tree.forEach(function(node){
@@ -60,21 +63,23 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
     });
 
     var data = { 'core' : { 'data' : jsTreeData } };
-    FirebaseService.addData(data);
+    FirebaseService.addData(data, self.repo);
+    buildTree(data);
+  }
+
+    function buildTree(content){
+      console.log(content, "data");
 
     $('#jstree').on('select_node.jstree', function (e, data) {
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      var raw      = "https://raw.githubusercontent.com/" + repo + "/master/" + file;
+      var raw      = "https://raw.githubusercontent.com/" + content.repo + "/master/" + file;
       var node     = data.node.id;
       var filePath = data.node.original.filePath;
 
       CodeMirrorService.init(raw, file, node, filePath);
-    }).jstree({
-    "core" : {
-      "data" : jsTreeData
-    },
+    }).jstree({ "core": content.core }, {
     "types" : {
       "folder" : {
         "icon" : "/images/folder.png"

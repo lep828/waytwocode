@@ -81,8 +81,6 @@ app.get("/token", function(req, res){
 });
 
 app.get("/*", function(req, res){
-  console.log("oi", req.params[0]);
-  // res.redirect("/");
   res.sendFile(__dirname + "/public/index.html");
 });
 

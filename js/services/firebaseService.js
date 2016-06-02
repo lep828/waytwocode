@@ -32,7 +32,9 @@ function FirebaseService($state, $http){
     });
   }
 
-  function addData(data){
+  function addData(data, repo){
+    data.repo = repo;
+    console.log(data);
     var url = "/add/" + self.key;
     $http.post(url, data).then(function(res){
       // console.log(res);
