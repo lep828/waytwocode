@@ -1529,6 +1529,36 @@ html, body {
   font-family: Lato;
 }
 
+.intro-message{
+  background: gray;
+  position: relative;
+  padding-top: 15%;
+  padding-bottom: 20%;
+  text-align: center;
+  min-height: 100%;
+  color: #f8f8f8;
+
+  h1 {
+    margin: 0;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+    font-size: 4.5em;
+  }
+  h3 {
+    margin-top: 10px;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+  }
+  .intro-divider{
+    width: 400px;
+    margin-top: 10%;
+    border-top: 1px solid #f8f8f8;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  #githubLogin {
+    margin-top: 25px;
+    background-color: #f8f8f8;
+  }
+}
+
 .left {
   float: left;
   background: #f5f5f5;

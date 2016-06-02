@@ -9,7 +9,7 @@
 </head>
 <body ng-controller="MainController as main">
   <header>
-    <nav class="navbar navbar-dark bg-inverse">
+    <nav class="navbar navbar-full navbar-dark bg-inverse">
       <a class="navbar-brand" href="/">WayTwoCode</a>
       <ul class="nav navbar-nav pull-xs-right">
         <li class="nav-item">
@@ -24,8 +24,7 @@
       </ul>
     </nav>
   </header>
-  <main>
-    <div class="container" ui-view></div>
+  <main ui-view>
   </main>
 </body>
 </html>
