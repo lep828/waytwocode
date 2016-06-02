@@ -19,7 +19,6 @@ function GithubService(jsTreeService, $http){
       var token = res.token;
       if(!token) return false;
       $("#githubLogin").hide();
-      // console.log(token);
       self.token = token;
       getRepo(token);
     });
@@ -31,16 +30,6 @@ function GithubService(jsTreeService, $http){
     }).done(function(res){
       $("#card-deck").empty();
       res.forEach(function(repo){
-        // $("#card-deck").append(
-        //   '<div class="col-md-4">'+
-        //     '<div class="card" id='+ repo.full_name +'>'+
-        //       '<div class="card-block">'+
-        //         '<h4 class="card-title">'+ repo.name +'</h4>'+
-        //         '<p class="card-text">'+ repo.description +'</p>'+
-        //       '</div>'+
-        //     '</div>'+
-        //   '</div>'
-        // );
         $("#list-group").append(
           '<li class="list-group-item" id='+repo.full_name+'>'+
             repo.name +
@@ -49,7 +38,7 @@ function GithubService(jsTreeService, $http){
       });
 
       $(".list-group-item").on("click", function(event){
-        console.log(event.currentTarget.id);
+        // console.log(event.currentTarget.id);
         var repo = event.currentTarget.id;
         self.repo = repo;
         jsTreeService.getSha(repo, token);
@@ -58,11 +47,9 @@ function GithubService(jsTreeService, $http){
   }
 
   function makeCommit(filePath, content, message) {
-    // var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
     var url = "https://api.github.com/repos/"+self.repo+"/contents/"+filePath;
     return $http.get(url)
       .then(function(response) {
-        // console.log(response.data.sha);
         var sha = response.data.sha;
         return putCommit(filePath, content, sha, url, message);
       });

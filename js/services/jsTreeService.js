@@ -18,6 +18,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
+      CodeMirrorService.createCodeMirror();
       // console.log("First response", response);
       var sha = response.data.object.sha;
       self.sha = sha;

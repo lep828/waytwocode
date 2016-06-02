@@ -10,11 +10,24 @@ function CodeMirrorService(FirebaseService){
   self.init = init;
   self.getValue = getValue;
   self.myCodeMirror = {};
+  self.createCodeMirror = createCodeMirror;
+
+  function createCodeMirror(){
+    self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
+      lineNumbers: true,
+      lineWrapping: true,
+      tabSize: 2,
+      value: "",
+      mode: "javascript",
+      viewportMargin: Infinity,
+      theme: "monokai",
+      autoCloseBrackets: true,
+      scrollbarStyle: "overlay"
+    });
+  }
 
   function init(raw, file, node, filePath) {
     self.filePath = filePath;
-
-    console.log(filePath);
     $.ajax({
       url: raw
     }).done(function(response){
@@ -55,23 +68,13 @@ function CodeMirrorService(FirebaseService){
           break;
       }
 
-      $("#editor").empty();
-      self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
-        lineNumbers: true,
-        lineWrapping: true,
-        tabSize: 2,
-        value: response,
-        mode:  mode,
-        viewportMargin: Infinity,
-        theme: "monokai",
-        autoCloseBrackets: true,
-        scrollbarStyle: "overlay"
-      });
+      // $("#editor").empty();
+      self.myCodeMirror.setOption("mode", mode);
+      self.myCodeMirror.setValue(response);
     });
   }
 
   function getValue(){
-    console.log(self.myCodeMirror);
     return btoa(self.myCodeMirror.getValue());
   }
 }
