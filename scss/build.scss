@@ -1530,7 +1530,8 @@ html, body {
 }
 
 .intro-message{
-  background: gray;
+  background: url('/images/landing.jpg') no-repeat center center;
+  background-size: cover;
   position: relative;
   padding-top: 15%;
   padding-bottom: 20%;
