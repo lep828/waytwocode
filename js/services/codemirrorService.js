@@ -2,10 +2,9 @@ angular
   .module("PairProgramming")
   .service("CodeMirrorService", CodeMirrorService);
 
-CodeMirrorService.$inject = ["FirebaseService"];
-function CodeMirrorService(FirebaseService){
+CodeMirrorService.$inject = ["FirebaseService", "$http"];
+function CodeMirrorService(FirebaseService, $http){
   var self = this;
-
 
   self.init = init;
   self.getValue = getValue;
@@ -28,10 +27,8 @@ function CodeMirrorService(FirebaseService){
 
   function init(raw, file, node, filePath) {
     self.filePath = filePath;
-    $.ajax({
-      url: raw
-    }).done(function(response){
-      var data = { content: btoa(response) };
+    $http.get(raw).then(function(res){
+      var data = { content: btoa(res.data) };
       FirebaseService.updateNode(node, data);
 
       var mode;
@@ -68,9 +65,8 @@ function CodeMirrorService(FirebaseService){
           break;
       }
 
-      // $("#editor").empty();
       self.myCodeMirror.setOption("mode", mode);
-      self.myCodeMirror.setValue(response);
+      self.myCodeMirror.setValue(res.data);
     });
   }
 

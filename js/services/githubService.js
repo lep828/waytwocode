@@ -12,11 +12,8 @@ function GithubService(jsTreeService, $http){
   self.putCommit  = putCommit;
 
   function getToken(){
-    $.ajax({
-      url: "/token",
-      dataType: "json"
-    }).done(function(res){
-      var token = res.token;
+    $http.get('http://localhost:3000/token').then(function(res){
+      var token = res.data.token;
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
@@ -25,24 +22,17 @@ function GithubService(jsTreeService, $http){
   }
 
   function getRepo(token){
-    $.ajax({
-      url: "https://api.github.com/user/repos?access_token=" + token
-    }).done(function(res){
-      $("#card-deck").empty();
-      res.forEach(function(repo){
-        $("#list-group").append(
-          '<li class="list-group-item" id='+repo.full_name+'>'+
-            repo.name +
-          '</li>'
-        );
-      });
+    $http.get("https://api.github.com/user/repos?access_token=" + token)
+      .then(function(res){
+        res.data.forEach(function(repo){
+          self.repos.push(repo);
+        });
 
-      $(".list-group-item").on("click", function(event){
-        // console.log(event.currentTarget.id);
-        var repo = event.currentTarget.id;
-        self.repo = repo;
-        jsTreeService.getSha(repo, token);
-      });
+        $(".list-group").delegate(".list-group-item", "click", function(event){
+          var repo = event.currentTarget.id;
+          self.repo = repo;
+          jsTreeService.getSha(repo, token);
+        });
     });
   }
 

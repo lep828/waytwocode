@@ -69675,22 +69675,14 @@ function MainController(GithubService, CodeMirrorService, jsTreeService){
   self.commit = {};
 
   function commitForm(){
-
     var message  = self.commit.message;
     var data     = CodeMirrorService.getValue();
     var filePath = CodeMirrorService.filePath;
     GithubService.makeCommit(filePath, data, message);
   }
 
-  // $("#commitForm").on("submit", function(){
-  //   var data = CodeMirrorService.getValue();
-  //   GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
-  // });
-
   $("#repositories").on("click", function(){
     GithubService.start();
-    // var user = GithubService.user;
-    // console.log(user, "here");
   });
 }
 
@@ -69698,10 +69690,9 @@ angular
   .module("PairProgramming")
   .service("CodeMirrorService", CodeMirrorService);
 
-CodeMirrorService.$inject = ["FirebaseService"];
-function CodeMirrorService(FirebaseService){
+CodeMirrorService.$inject = ["FirebaseService", "$http"];
+function CodeMirrorService(FirebaseService, $http){
   var self = this;
-
 
   self.init = init;
   self.getValue = getValue;
@@ -69724,10 +69715,8 @@ function CodeMirrorService(FirebaseService){
 
   function init(raw, file, node, filePath) {
     self.filePath = filePath;
-    $.ajax({
-      url: raw
-    }).done(function(response){
-      var data = { content: btoa(response) };
+    $http.get(raw).then(function(res){
+      var data = { content: btoa(res.data) };
       FirebaseService.updateNode(node, data);
 
       var mode;
@@ -69764,9 +69753,8 @@ function CodeMirrorService(FirebaseService){
           break;
       }
 
-      // $("#editor").empty();
       self.myCodeMirror.setOption("mode", mode);
-      self.myCodeMirror.setValue(response);
+      self.myCodeMirror.setValue(res.data);
     });
   }
 
@@ -69779,8 +69767,8 @@ angular
   .module("PairProgramming")
   .service("FirebaseService", FirebaseService);
 
-FirebaseService.$inject = ["$state"];
-function FirebaseService($state){
+FirebaseService.$inject = ["$state", "$http"];
+function FirebaseService($state, $http){
   var self = this;
 
   self.addData    = addData;
@@ -69790,41 +69778,30 @@ function FirebaseService($state){
 
   function getData(key){
     url = "/get_data/" + key;
-    $.ajax({
-      url: url
-    }).done(function(res){
-      console.log("got ", res);
+    $http.get(url).then(function(res){
+      console.log("got", res);
     });
   }
 
   function createKey(){
-    $.ajax({
-      url: "/key"
-    }).done(function(res){
-      // console.log(res.key);
-      self.key = res.key;
+    $http.get("/key").then(function(res){
+      self.key = res.data.key;
     });
   }
 
   function updateNode(node, data){
-    $.ajax({
-      url: "/update/" + self.key + "/" + node,
-      method: "POST",
-      data: data
-    }).done(function(res){
-      // console.log(atob(res.content));
-      console.log("updated node in firebase");
+    var url = "/update/" + self.key + "/" + node;
+    $http.post(url, data).then(function(res){
+      // console.log(res);
+      console.log("updated in firebase");
     });
   }
 
   function addData(data){
-    $.ajax({
-      url: "/add/" + self.key,
-      method: "POST",
-      data: data
-    }).done(function(res){
+    var url = "/add/" + self.key;
+    $http.post(url, data).then(function(res){
+      // console.log(res);
       console.log("added to firebase");
-      // console.log("this", res);
     });
   }
 }
@@ -69843,11 +69820,8 @@ function GithubService(jsTreeService, $http){
   self.putCommit  = putCommit;
 
   function getToken(){
-    $.ajax({
-      url: "/token",
-      dataType: "json"
-    }).done(function(res){
-      var token = res.token;
+    $http.get('http://localhost:3000/token').then(function(res){
+      var token = res.data.token;
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
@@ -69856,24 +69830,17 @@ function GithubService(jsTreeService, $http){
   }
 
   function getRepo(token){
-    $.ajax({
-      url: "https://api.github.com/user/repos?access_token=" + token
-    }).done(function(res){
-      $("#card-deck").empty();
-      res.forEach(function(repo){
-        $("#list-group").append(
-          '<li class="list-group-item" id='+repo.full_name+'>'+
-            repo.name +
-          '</li>'
-        );
-      });
+    $http.get("https://api.github.com/user/repos?access_token=" + token)
+      .then(function(res){
+        res.data.forEach(function(repo){
+          self.repos.push(repo);
+        });
 
-      $(".list-group-item").on("click", function(event){
-        // console.log(event.currentTarget.id);
-        var repo = event.currentTarget.id;
-        self.repo = repo;
-        jsTreeService.getSha(repo, token);
-      });
+        $(".list-group").delegate(".list-group-item", "click", function(event){
+          var repo = event.currentTarget.id;
+          self.repo = repo;
+          jsTreeService.getSha(repo, token);
+        });
     });
   }
 
@@ -69908,8 +69875,8 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state"];
-function jsTreeService(CodeMirrorService, FirebaseService, $state){
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http"];
+function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
   FirebaseService.createKey();
 
   var self = this;
@@ -69920,25 +69887,20 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
     $("#commit").css("display", "block");
 
-    $.ajax({
-      url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
-      dataType: "jsonp"
-    }).done(function(response){
+    var url = "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token;
+    $http.get(url).then(function(res){
       CodeMirrorService.createCodeMirror();
-      // console.log("First response", response);
-      var sha = response.data.object.sha;
+      // console.log("First response", res);
+      var sha = res.data.object.sha;
       self.sha = sha;
       getTree(repo, token, sha);
     });
   }
 
   function getTree(repo, token, sha){
-    $.ajax({
-      url: "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token,
-      dataType: "jsonp"
-    }).done(function(response){
-      // console.log("Second response", response);
-      var tree  = response.data.tree;
+    var url = "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token;
+    $http.get(url).then(function(res){
+      var tree  = res.data.tree;
       buildTree(repo, tree);
     });
   }

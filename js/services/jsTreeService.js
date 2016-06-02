@@ -2,8 +2,8 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state"];
-function jsTreeService(CodeMirrorService, FirebaseService, $state){
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http"];
+function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
   FirebaseService.createKey();
 
   var self = this;
@@ -14,25 +14,20 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
     $("#commit").css("display", "block");
 
-    $.ajax({
-      url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
-      dataType: "jsonp"
-    }).done(function(response){
+    var url = "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token;
+    $http.get(url).then(function(res){
       CodeMirrorService.createCodeMirror();
-      // console.log("First response", response);
-      var sha = response.data.object.sha;
+      // console.log("First response", res);
+      var sha = res.data.object.sha;
       self.sha = sha;
       getTree(repo, token, sha);
     });
   }
 
   function getTree(repo, token, sha){
-    $.ajax({
-      url: "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token,
-      dataType: "jsonp"
-    }).done(function(response){
-      // console.log("Second response", response);
-      var tree  = response.data.tree;
+    var url = "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token;
+    $http.get(url).then(function(res){
+      var tree  = res.data.tree;
       buildTree(repo, tree);
     });
   }

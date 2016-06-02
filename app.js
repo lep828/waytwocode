@@ -31,14 +31,6 @@ firebase.initializeApp({
 
 var database = firebase.database();
 
-// database.ref("/").on("child_added", function(res){
-//   // console.log(res.val(), 'added');
-// });
-//
-// database.ref("/").on("child_changed", function(res){
-//   // console.log(res.val(), 'changed');
-// });
-
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
