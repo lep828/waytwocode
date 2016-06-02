@@ -69318,10 +69318,16 @@ angular
   .module("PairProgramming")
   .controller("MainController", MainController);
 
-MainController.$inject = ['GithubService'];
-function MainController(GithubService){
+MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService'];
+function MainController(GithubService, CodeMirrorService, jsTreeService){
   var self = this;
   self.repos = GithubService.repos;
+
+  $("#test").on("click", function(){
+    if (!jsTreeService.sha) return false;
+    var data = CodeMirrorService.getValue();
+    GithubService.makeCommit('meme-runner', 'lep828', 'js/app.js', data);
+  });
 
   $("#repositories").on("click", function(){
     GithubService.start();
@@ -69339,12 +69345,14 @@ function CodeMirrorService(FirebaseService){
   var self = this;
 
   self.init = init;
+  self.getValue = getValue;
+  self.myCodeMirror = {};
 
   function init(raw, path, node) {
     $.ajax({
       url: raw
     }).done(function(response){
-      var data = { content: btoa(response)};
+      var data = { content: btoa(response) };
       FirebaseService.updateNode(node, data);
 
       var mode;
@@ -69366,7 +69374,6 @@ function CodeMirrorService(FirebaseService){
           break;
         case ".scss":
           mode = "scss";
-          // "text/x-scss"
           break;
         case ".sass":
           mode = "sass";
@@ -69383,7 +69390,7 @@ function CodeMirrorService(FirebaseService){
       }
 
       $("#editor").empty();
-      var myCodeMirror = CodeMirror(document.getElementById("editor"), {
+      self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
         lineNumbers: true,
         lineWrapping: true,
         tabSize: 2,
@@ -69393,6 +69400,10 @@ function CodeMirrorService(FirebaseService){
         theme: "monokai"
       });
     });
+  }
+
+  function getValue(){
+    return btoa(self.myCodeMirror.getValue());
   }
 }
 
@@ -69452,15 +69463,17 @@ function FirebaseService($state){
 }
 
 angular
-  .module("PairProgramming")
-  .service("GithubService", GithubService);
+.module("PairProgramming")
+.service("GithubService", GithubService);
 
-GithubService.$inject = ["jsTreeService"];
-function GithubService(jsTreeService){
+GithubService.$inject = ["jsTreeService", "$http"];
+function GithubService(jsTreeService, $http){
   var self = this;
 
   self.start = getToken;
   self.repos = [];
+  self.makeCommit = makeCommit;
+  self.putCommit = putCommit;
 
   function getToken(){
     $.ajax({
@@ -69470,6 +69483,7 @@ function GithubService(jsTreeService){
       var token = res.token;
       if(!token) return false;
       $("#githubLogin").hide();
+      console.log(token);
       self.token = token;
       getRepo(token);
     });
@@ -69479,17 +69493,18 @@ function GithubService(jsTreeService){
     $.ajax({
       url: "https://api.github.com/user/repos?access_token=" + token
     }).done(function(res){
-      console.log(res);
-        $("#card-deck").empty();
+      $("#card-deck").empty();
       res.forEach(function(repo){
         $("#card-deck").append(
-        '<div class="card" id='+repo.full_name+'>'+
-          '<div class="card-block">'+
-            '<h4 class="card-title">'+repo.name+'</h4>'+
-            '<p class="card-text">'+repo.description+'</p>'+
-          '</div>'+
-        '</div>');
-        // $("#repos").append("<li>" + repo.full_name + "</li>");
+          // '<div class="col-md-4">'+
+            '<div class="card" id='+ repo.full_name +'>'+
+              '<div class="card-block">'+
+                '<h4 class="card-title">'+ repo.name +'</h4>'+
+                '<p class="card-text">'+ repo.description +'</p>'+
+              '</div>'+
+            // '</div>'+
+          '</div>'
+        );
       });
 
       $(".card").on("click", function(event){
@@ -69497,6 +69512,33 @@ function GithubService(jsTreeService){
         var repo = event.currentTarget.id;
         jsTreeService.getSha(repo, token);
       });
+    });
+  }
+
+  function makeCommit(repo, owner, path, content) {
+    var url = "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path;
+    return $http.get(url)
+      .then(function(response) {
+        console.log(response.data.sha);
+        var sha = response.data.sha;
+        return putCommit(path, content, sha, url);
+      });
+  }
+
+  function putCommit(path, content, sha, url){
+    var data = {
+      message: "commit message",
+      content: content,
+      sha: sha,
+    };
+    var config = {
+      params: {
+        path: path,
+        access_token: self.token
+      }
+    };
+    $http.put(url, data, config).then(function(res){
+      console.log(res);
     });
   }
 }
@@ -69518,8 +69560,9 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      // console.log("First response", response);
+      console.log("First response", response);
       var sha = response.data.object.sha;
+      self.sha = sha;
       getTree(repo, token, sha);
     });
   }
@@ -69529,7 +69572,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      // console.log("Second response", response);
+      console.log("Second response", response);
       var tree  = response.data.tree;
       buildTree(repo, tree);
     });
@@ -69544,8 +69587,8 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
-      var treeData   = {};
       var path       = parent[parent.length-1];
+      var treeData   = {};
 
       if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
        treeData.type = "folder";
@@ -69576,7 +69619,6 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
       var raw  = "https://raw.githubusercontent.com/" + repo + "/master/" + path;
-
       var node = data.instance._data.core.selected[0];
 
       CodeMirrorService.init(raw, path, node);

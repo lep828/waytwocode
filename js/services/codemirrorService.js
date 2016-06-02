@@ -7,12 +7,14 @@ function CodeMirrorService(FirebaseService){
   var self = this;
 
   self.init = init;
+  self.getValue = getValue;
+  self.myCodeMirror = {};
 
   function init(raw, path, node) {
     $.ajax({
       url: raw
     }).done(function(response){
-      var data = { content: btoa(response)};
+      var data = { content: btoa(response) };
       FirebaseService.updateNode(node, data);
 
       var mode;
@@ -34,7 +36,6 @@ function CodeMirrorService(FirebaseService){
           break;
         case ".scss":
           mode = "scss";
-          // "text/x-scss"
           break;
         case ".sass":
           mode = "sass";
@@ -51,7 +52,7 @@ function CodeMirrorService(FirebaseService){
       }
 
       $("#editor").empty();
-      var myCodeMirror = CodeMirror(document.getElementById("editor"), {
+      self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
         lineNumbers: true,
         lineWrapping: true,
         tabSize: 2,
@@ -61,5 +62,9 @@ function CodeMirrorService(FirebaseService){
         theme: "monokai"
       });
     });
+  }
+
+  function getValue(){
+    return btoa(self.myCodeMirror.getValue());
   }
 }

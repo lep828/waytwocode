@@ -15,8 +15,9 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/refs/heads/master?access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      // console.log("First response", response);
+      console.log("First response", response);
       var sha = response.data.object.sha;
+      self.sha = sha;
       getTree(repo, token, sha);
     });
   }
@@ -26,7 +27,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       url: "https://api.github.com/repos/" + repo + "/git/trees/" + sha + "?recursive=1&access_token=" + token,
       dataType: "jsonp"
     }).done(function(response){
-      // console.log("Second response", response);
+      console.log("Second response", response);
       var tree  = response.data.tree;
       buildTree(repo, tree);
     });
@@ -41,8 +42,8 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
 
     var jsTreeData = tree.map(function(node){
       var parent     = node.path.split("/");
-      var treeData   = {};
       var path       = parent[parent.length-1];
+      var treeData   = {};
 
       if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
        treeData.type = "folder";
@@ -73,7 +74,6 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state){
       if (!path.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
       var raw  = "https://raw.githubusercontent.com/" + repo + "/master/" + path;
-
       var node = data.instance._data.core.selected[0];
 
       CodeMirrorService.init(raw, path, node);
