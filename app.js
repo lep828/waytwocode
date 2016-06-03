@@ -40,8 +40,12 @@ app.post("/add/:key", function(req, res){
   res.json({ key: key });
 });
 
-app.get("/get_data/:key", function(req, res){
-  var url = req.params.key;
+app.post("/get_data/:key/:id", function(req, res){
+  // var url = req.params.key;
+  // var url = req.body.key + "/"  + req.body.file;
+  // url = url.replace(/\.[^/.]+$/, "");
+  // console.log(url);
+  var url = req.params.key + "/core/data/" + req.params.id;
   database.ref(url).on("value", function(data){
     res.json(data.val());
   });

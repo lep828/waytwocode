@@ -71306,8 +71306,8 @@ angular
   .module("PairProgramming")
   .service("FirebaseService", FirebaseService);
 
-FirebaseService.$inject = ["$state", "$http"];
-function FirebaseService($state, $http){
+FirebaseService.$inject = ["$state", "$http", "$stateParams"];
+function FirebaseService($state, $http, $stateParams){
   var self = this;
 
   self.addData    = addData;
@@ -71315,10 +71315,14 @@ function FirebaseService($state, $http){
   self.createKey  = createKey;
   self.getData    = getData;
 
-  function getData(key){
-    url = "/get_data/" + key;
+  function getData(node, cb){
+    // console.log($stateParams, "here");
+    url = "/get_data/" + $stateParams.key + "/" + node;
+    // var data = {
+    //    key: $stateParams.key, file: file
+    // };
     $http.get(url).then(function(res){
-      console.log("got", res);
+      return cb(res);
     });
   }
 
