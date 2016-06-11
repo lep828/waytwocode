@@ -14,6 +14,7 @@ function GithubService(jsTreeService, $http){
   function getToken(){
     $http.get('http://localhost:3000/token').then(function(res){
       var token = res.data.token;
+      console.log("testing token", token);
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
@@ -37,16 +38,20 @@ function GithubService(jsTreeService, $http){
     });
   }
 
-  function makeCommit(filePath, content, message) {
-    var url = "https://api.github.com/repos/"+self.repo+"/contents/"+filePath;
+  function makeCommit(filePath, content, message, repo, token) {
+    var repository = repo ? repo : self.repo;
+    var access_token = token ? token : self.token;
+    var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
+
     return $http.get(url)
       .then(function(response) {
         var sha = response.data.sha;
-        return putCommit(filePath, content, sha, url, message);
+        return putCommit(filePath, content, sha, url, message, access_token);
       });
   }
 
-  function putCommit(filePath, content, sha, url, message){
+  function putCommit(filePath, content, sha, url, message, access_token){
+    console.log(access_token, "token");
     var data = {
       message: message,
       content: content,
@@ -55,7 +60,7 @@ function GithubService(jsTreeService, $http){
     var config = {
       params: {
         path: filePath,
-        access_token: self.token
+        access_token: access_token
       }
     };
     $http.put(url, data, config).then(function(res){

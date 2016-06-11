@@ -12,7 +12,7 @@ function CodeMirrorService(FirebaseService, $http){
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
-    // $("#editor").empty();
+    $("#editor").empty();
     self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
       lineNumbers: true,
       lineWrapping: true,

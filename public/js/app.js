@@ -71201,7 +71201,9 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
 
     ref.child(key).once("value").then(function(data){
       var tree = data.val();
+      self.repo = tree.repo;
       // console.log(tree);
+      self.token = tree.token;
       jsTreeService.buildTree(tree);
     });
   });
@@ -71210,7 +71212,7 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
     var message  = self.commit.message;
     var data     = CodeMirrorService.getValue();
     var filePath = CodeMirrorService.filePath;
-    GithubService.makeCommit(filePath, data, message);
+    GithubService.makeCommit(filePath, data, message, self.repo, self.token);
   }
 
   $("#repositories").on("click", function(){
@@ -71232,7 +71234,7 @@ function CodeMirrorService(FirebaseService, $http){
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
-    // $("#editor").empty();
+    $("#editor").empty();
     self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
       lineNumbers: true,
       lineWrapping: true,
@@ -71311,11 +71313,8 @@ function FirebaseService($state, $http, $stateParams){
   self.getData    = getData;
 
   function getData(node, cb){
-    console.log($stateParams, "here");
+    // console.log($stateParams, "here");
     url = "/get_data/" + $stateParams.key + "/" + node;
-    // var data = {
-    //    key: $stateParams.key, file: file
-    // };
     $http.get(url).then(function(res){
       return cb(res);
     });
@@ -71335,8 +71334,9 @@ function FirebaseService($state, $http, $stateParams){
     });
   }
 
-  function addData(data, repo){
+  function addData(data, repo, token){
     data.repo = repo;
+    data.token = token;
     console.log(data);
     var url = "/add/" + self.key;
     $http.post(url, data).then(function(res){
@@ -71362,6 +71362,7 @@ function GithubService(jsTreeService, $http){
   function getToken(){
     $http.get('http://localhost:3000/token').then(function(res){
       var token = res.data.token;
+      console.log("testing token", token);
       if(!token) return false;
       $("#githubLogin").hide();
       self.token = token;
@@ -71385,16 +71386,20 @@ function GithubService(jsTreeService, $http){
     });
   }
 
-  function makeCommit(filePath, content, message) {
-    var url = "https://api.github.com/repos/"+self.repo+"/contents/"+filePath;
+  function makeCommit(filePath, content, message, repo, token) {
+    var repository = repo ? repo : self.repo;
+    var access_token = token ? token : self.token;
+    var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
+
     return $http.get(url)
       .then(function(response) {
         var sha = response.data.sha;
-        return putCommit(filePath, content, sha, url, message);
+        return putCommit(filePath, content, sha, url, message, access_token);
       });
   }
 
-  function putCommit(filePath, content, sha, url, message){
+  function putCommit(filePath, content, sha, url, message, access_token){
+    console.log(access_token, "token");
     var data = {
       message: message,
       content: content,
@@ -71403,7 +71408,7 @@ function GithubService(jsTreeService, $http){
     var config = {
       params: {
         path: filePath,
-        access_token: self.token
+        access_token: access_token
       }
     };
     $http.put(url, data, config).then(function(res){
@@ -71428,6 +71433,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
   function getSha(repo, token){
     $state.go("code", { key: FirebaseService.key });
     self.repo = repo;
+    self.token = token;
     $("#commit").css("display", "block");
 
     var url = "https://api.github.com/repos/" + self.repo + "/git/refs/heads/master?access_token=" + token;
@@ -71477,13 +71483,12 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
     });
 
     var data = { 'core' : { 'data' : jsTreeData } };
-    FirebaseService.addData(data, self.repo);
+    FirebaseService.addData(data, self.repo, self.token);
     buildTree(data);
   }
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
-      console.log(content);
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 

@@ -19,7 +19,9 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
 
     ref.child(key).once("value").then(function(data){
       var tree = data.val();
+      self.repo = tree.repo;
       // console.log(tree);
+      self.token = tree.token;
       jsTreeService.buildTree(tree);
     });
   });
@@ -28,7 +30,7 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
     var message  = self.commit.message;
     var data     = CodeMirrorService.getValue();
     var filePath = CodeMirrorService.filePath;
-    GithubService.makeCommit(filePath, data, message);
+    GithubService.makeCommit(filePath, data, message, self.repo, self.token);
   }
 
   $("#repositories").on("click", function(){
