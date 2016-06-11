@@ -8,7 +8,7 @@ function CodeMirrorService(FirebaseService, $http){
 
   self.changeFile = changeFile;
   self.getValue = getValue;
-  // self.myCodeMirror = {};
+  self.myCodeMirror = {};
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
@@ -29,6 +29,7 @@ function CodeMirrorService(FirebaseService, $http){
   function changeFile(raw, file, node, filePath) {
     self.filePath = filePath;
     $http.get(raw).then(function(res){
+      console.log("here");
       var data = { content: btoa(res.data) };
       FirebaseService.updateNode(node, data);
 

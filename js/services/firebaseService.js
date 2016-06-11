@@ -12,7 +12,7 @@ function FirebaseService($state, $http, $stateParams){
   self.getData    = getData;
 
   function getData(node, cb){
-    // console.log($stateParams, "here");
+    console.log($stateParams, "here");
     url = "/get_data/" + $stateParams.key + "/" + node;
     // var data = {
     //    key: $stateParams.key, file: file

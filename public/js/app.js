@@ -71197,9 +71197,6 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   ref.on('value', function(data){
     if (!$stateParams.key) return false;
     var key = $stateParams.key;
-    // console.log(key);
-    // console.log(self.data);
-    // console.log("here", self.data[key]);
     CodeMirrorService.createCodeMirror();
 
     ref.child(key).once("value").then(function(data){
@@ -71207,9 +71204,6 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
       // console.log(tree);
       jsTreeService.buildTree(tree);
     });
-
-    // var tree = $firebaseObject(firebase.database().ref(key + "/core"));
-    // jsTreeService.buildTree(tree);
   });
 
   function commitForm(){
@@ -71234,7 +71228,7 @@ function CodeMirrorService(FirebaseService, $http){
 
   self.changeFile = changeFile;
   self.getValue = getValue;
-  // self.myCodeMirror = {};
+  self.myCodeMirror = {};
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
@@ -71255,6 +71249,7 @@ function CodeMirrorService(FirebaseService, $http){
   function changeFile(raw, file, node, filePath) {
     self.filePath = filePath;
     $http.get(raw).then(function(res){
+      console.log("here");
       var data = { content: btoa(res.data) };
       FirebaseService.updateNode(node, data);
 
@@ -71316,7 +71311,7 @@ function FirebaseService($state, $http, $stateParams){
   self.getData    = getData;
 
   function getData(node, cb){
-    // console.log($stateParams, "here");
+    console.log($stateParams, "here");
     url = "/get_data/" + $stateParams.key + "/" + node;
     // var data = {
     //    key: $stateParams.key, file: file
@@ -71488,6 +71483,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
+      console.log(content);
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 

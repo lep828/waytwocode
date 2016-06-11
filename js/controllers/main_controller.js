@@ -15,9 +15,6 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   ref.on('value', function(data){
     if (!$stateParams.key) return false;
     var key = $stateParams.key;
-    // console.log(key);
-    // console.log(self.data);
-    // console.log("here", self.data[key]);
     CodeMirrorService.createCodeMirror();
 
     ref.child(key).once("value").then(function(data){
@@ -25,9 +22,6 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
       // console.log(tree);
       jsTreeService.buildTree(tree);
     });
-
-    // var tree = $firebaseObject(firebase.database().ref(key + "/core"));
-    // jsTreeService.buildTree(tree);
   });
 
   function commitForm(){

@@ -69,6 +69,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
+      console.log(content);
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
