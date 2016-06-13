@@ -6,16 +6,6 @@ var morgan         = require("morgan");
 var rp             = require("request-promise");
 var firebase       = require("firebase");
 
-// firebase.initializeApp({
-//   serviceAccount: {
-//     projectId: "pair-programming-6ffa9",
-//     clientEmail: "test-7@pair-programming-6ffa9.iam.gserviceaccount.com",
-//     privateKey: "-----BEGIN PRIVATE KEY-----\n" + process.env.FIREBASE_PRIVATE_KEY + "\n-----END PRIVATE KEY-----\n"
-//   },
-//   apiKey: process.env.FIREBASE_SERVER_KEY,
-//   databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
-// });
-
 firebase.initializeApp({
   apiKey: process.env.FIREBASE_SERVER_KEY,
   databaseURL: "https://pair-programming-6ffa9.firebaseio.com",
@@ -41,10 +31,6 @@ app.post("/add/:key", function(req, res){
 });
 
 app.post("/get_data/:key/:id", function(req, res){
-  // var url = req.params.key;
-  // var url = req.body.key + "/"  + req.body.file;
-  // url = url.replace(/\.[^/.]+$/, "");
-  // console.log(url);
   var url = req.params.key + "/core/data/" + req.params.id;
   database.ref(url).on("value", function(data){
     res.json(data.val());
