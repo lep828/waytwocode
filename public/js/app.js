@@ -71157,6 +71157,7 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 angular
   .module("PairProgramming", ["ui.router", "firebase"])
+  .constant("URL", "https://waytwocode.herokuapp.com")
   .config(MainRouter);
 
 MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
@@ -71360,7 +71361,7 @@ function GithubService(jsTreeService, $http){
   self.repos = [];
 
   function getToken(){
-    $http.get('http://localhost:3000/token').then(function(res){
+    $http.get('https://waytwocode.herokuapp.com/token').then(function(res){
       var token = res.data.token;
       console.log("testing token", token);
       if(!token) return false;
