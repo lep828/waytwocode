@@ -55,7 +55,8 @@ app.get("/github", function(req, res){
     client_id: process.env.GITHUB_CLIENT_ID,
     client_secret:  process.env.GITHUB_CLIENT_SECRET,
     code: req.query.code,
-    redirect_uri: "https://waytwocode.herokuapp.com/github"
+    // redirect_uri: "https://waytwocode.herokuapp.com/github"
+    redirect_uri: "http://localhost:3000/github"
   };
   var params = serializeObject(data);
 

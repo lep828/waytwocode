@@ -1,6 +1,7 @@
 angular
   .module("PairProgramming", ["ui.router", "firebase"])
-  .constant("URL", "https://waytwocode.herokuapp.com")
+  // .constant("URL", "https://waytwocode.herokuapp.com")
+  .constant("URL", "http://localhost:3000")
   .config(MainRouter);
 
 MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
