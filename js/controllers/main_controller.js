@@ -10,17 +10,18 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   self.commit     = {};
 
   var ref = firebase.database().ref();
-  self.data = $firebaseObject(ref);
+  // self.data = $firebaseObject(ref);
 
-  ref.on('value', function(data){
+  ref.once('value').then(function(data){
     if (!$stateParams.key) return false;
+    console.log("why firebase???????!??????????????!!!?!");
     var key = $stateParams.key;
     CodeMirrorService.createCodeMirror();
 
     ref.child(key).once("value").then(function(data){
       var tree = data.val();
+      console.log("TREE DATA IS HERE",tree);
       self.repo = tree.repo;
-      // console.log(tree);
       self.token = tree.token;
       jsTreeService.buildTree(tree);
     });

@@ -26,50 +26,43 @@ function CodeMirrorService(FirebaseService, $http){
     });
   }
 
-  function changeFile(raw, file, node, filePath) {
-    self.filePath = filePath;
-    $http.get(raw).then(function(res){
-      console.log("here");
-      var data = { content: btoa(res.data) };
-      FirebaseService.updateNode(node, data);
+  function changeFile(content, file) {
+    var mode;
+    switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
+      case ".html":
+        mode = "xml";
+        break;
+      case ".erb":
+        mode = "xml";
+        break;
+      case ".ejs":
+        mode = "xml";
+        break;
+      case ".js":
+        mode = "javascript";
+        break;
+      case ".css":
+        mode = "css";
+        break;
+      case ".scss":
+        mode = "scss";
+        break;
+      case ".sass":
+        mode = "sass";
+        break;
+      case ".rb":
+        mode = "ruby";
+        break;
+      case ".php":
+        mode = "php";
+        break;
+      case ".md":
+        mode = "markdown";
+        break;
+    }
 
-      var mode;
-      switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
-        case ".html":
-          mode = "xml";
-          break;
-        case ".erb":
-          mode = "xml";
-          break;
-        case ".ejs":
-          mode = "xml";
-          break;
-        case ".js":
-          mode = "javascript";
-          break;
-        case ".css":
-          mode = "css";
-          break;
-        case ".scss":
-          mode = "scss";
-          break;
-        case ".sass":
-          mode = "sass";
-          break;
-        case ".rb":
-          mode = "ruby";
-          break;
-        case ".php":
-          mode = "php";
-          break;
-        case ".md":
-          mode = "markdown";
-          break;
-      }
-
-      self.myCodeMirror.setOption("mode", mode);
-      self.myCodeMirror.setValue(res.data);
-    });
+    self.myCodeMirror.setOption("mode", mode);
+    self.myCodeMirror.setValue(content);
   }
 
   function getValue(){

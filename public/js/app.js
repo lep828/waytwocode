@@ -71194,17 +71194,18 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   self.commit     = {};
 
   var ref = firebase.database().ref();
-  self.data = $firebaseObject(ref);
+  // self.data = $firebaseObject(ref);
 
-  ref.on('value', function(data){
+  ref.once('value').then(function(data){
     if (!$stateParams.key) return false;
+    console.log("why firebase???????!??????????????!!!?!");
     var key = $stateParams.key;
     CodeMirrorService.createCodeMirror();
 
     ref.child(key).once("value").then(function(data){
       var tree = data.val();
+      console.log("TREE DATA IS HERE",tree);
       self.repo = tree.repo;
-      // console.log(tree);
       self.token = tree.token;
       jsTreeService.buildTree(tree);
     });
@@ -71250,50 +71251,43 @@ function CodeMirrorService(FirebaseService, $http){
     });
   }
 
-  function changeFile(raw, file, node, filePath) {
-    self.filePath = filePath;
-    $http.get(raw).then(function(res){
-      console.log("here");
-      var data = { content: btoa(res.data) };
-      FirebaseService.updateNode(node, data);
+  function changeFile(content, file) {
+    var mode;
+    switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
+      case ".html":
+        mode = "xml";
+        break;
+      case ".erb":
+        mode = "xml";
+        break;
+      case ".ejs":
+        mode = "xml";
+        break;
+      case ".js":
+        mode = "javascript";
+        break;
+      case ".css":
+        mode = "css";
+        break;
+      case ".scss":
+        mode = "scss";
+        break;
+      case ".sass":
+        mode = "sass";
+        break;
+      case ".rb":
+        mode = "ruby";
+        break;
+      case ".php":
+        mode = "php";
+        break;
+      case ".md":
+        mode = "markdown";
+        break;
+    }
 
-      var mode;
-      switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
-        case ".html":
-          mode = "xml";
-          break;
-        case ".erb":
-          mode = "xml";
-          break;
-        case ".ejs":
-          mode = "xml";
-          break;
-        case ".js":
-          mode = "javascript";
-          break;
-        case ".css":
-          mode = "css";
-          break;
-        case ".scss":
-          mode = "scss";
-          break;
-        case ".sass":
-          mode = "sass";
-          break;
-        case ".rb":
-          mode = "ruby";
-          break;
-        case ".php":
-          mode = "php";
-          break;
-        case ".md":
-          mode = "markdown";
-          break;
-      }
-
-      self.myCodeMirror.setOption("mode", mode);
-      self.myCodeMirror.setValue(res.data);
-    });
+    self.myCodeMirror.setOption("mode", mode);
+    self.myCodeMirror.setValue(content);
   }
 
   function getValue(){
@@ -71339,12 +71333,16 @@ function FirebaseService($state, $http, $stateParams){
   function addData(data, repo, token){
     data.repo = repo;
     data.token = token;
-    console.log(data);
     var url = "/add/" + self.key;
-    $http.post(url, data).then(function(res){
-      // console.log(res);
-      console.log("added to firebase");
-    });
+
+    setTimeout(function(){
+      console.log("addDATA", data);
+      console.log("addDATA", JSON.stringify(data));
+      $http.post(url, JSON.stringify(data)).then(function(res){
+        // console.log(res);
+        console.log("added to firebase");
+      });
+    }, 4000);
   }
 }
 
@@ -71423,8 +71421,8 @@ angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http"];
-function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
+jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http", "$window"];
+function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $window){
   FirebaseService.createKey();
 
   var self       = this;
@@ -71452,7 +71450,6 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
     var url = "https://api.github.com/repos/" + self.repo + "/git/trees/" + self.sha + "?recursive=1&access_token=" + token;
     $http.get(url).then(function(res){
       var tree  = res.data.tree;
-      // console.log(tree);
       structureTree(tree);
     });
   }
@@ -71474,6 +71471,15 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
       treeData.filePath = node.path;
       treeData.parent   = "#";
 
+      if (treeData.type === "file") {
+        if (treeData.filePath.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
+            var raw = "https://raw.githubusercontent.com/" + self.repo + "/master/" + treeData.filePath;
+            $http.get(raw).then(function(res){
+              treeData.content = btoa(res.data);
+            });
+        }
+      }
+
       if (parent.length > 1) {
         var tempParent = node.path.split("/");
         tempParent.pop();
@@ -71486,7 +71492,11 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data, self.repo, self.token);
-    buildTree(data);
+
+    setTimeout(function(){
+      buildTree(data);
+    }, 3000);
+
   }
 
   function buildTree(content){
@@ -71494,19 +71504,16 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http){
       var file = data.instance.get_path(data.node,'/');
       if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      var raw      = "https://raw.githubusercontent.com/" + content.repo + "/master/" + file;
-      var node     = data.node.id;
-      var filePath = data.node.original.filePath;
-
-      CodeMirrorService.changeFile(raw, file, node, filePath);
+      var content = $window.atob(data.node.original.content);
+      CodeMirrorService.changeFile(content, file);
 
     }).jstree({ "core": content.core },
     { "types" : {
         "folder" : {
-          "icon" : "/images/folder.png"
+          "icon" : "public/images/folder.png"
         },
         "file" : {
-          "icon" : "/images/file.png"
+          "icon" : "public/images/file.png"
         }
       },
       "plugins" : ["types"]

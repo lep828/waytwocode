@@ -26,6 +26,7 @@ app.get("/", function(req, res) {
 
 app.post("/add/:key", function(req, res){
   var key = req.params.key;
+  console.log(req.body.core.data);
   database.ref("/" + key).update(req.body);
   res.json({ key: key });
 });

@@ -36,11 +36,15 @@ function FirebaseService($state, $http, $stateParams){
   function addData(data, repo, token){
     data.repo = repo;
     data.token = token;
-    console.log(data);
     var url = "/add/" + self.key;
-    $http.post(url, data).then(function(res){
-      // console.log(res);
-      console.log("added to firebase");
-    });
+
+    setTimeout(function(){
+      console.log("addDATA", data);
+      console.log("addDATA", JSON.stringify(data));
+      $http.post(url, JSON.stringify(data)).then(function(res){
+        // console.log(res);
+        console.log("added to firebase");
+      });
+    }, 4000);
   }
 }
