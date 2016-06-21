@@ -71002,159 +71002,6 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
   }
 });
 
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: http://codemirror.net/LICENSE
-
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-
-  function Bar(cls, orientation, scroll) {
-    this.orientation = orientation;
-    this.scroll = scroll;
-    this.screen = this.total = this.size = 1;
-    this.pos = 0;
-
-    this.node = document.createElement("div");
-    this.node.className = cls + "-" + orientation;
-    this.inner = this.node.appendChild(document.createElement("div"));
-
-    var self = this;
-    CodeMirror.on(this.inner, "mousedown", function(e) {
-      if (e.which != 1) return;
-      CodeMirror.e_preventDefault(e);
-      var axis = self.orientation == "horizontal" ? "pageX" : "pageY";
-      var start = e[axis], startpos = self.pos;
-      function done() {
-        CodeMirror.off(document, "mousemove", move);
-        CodeMirror.off(document, "mouseup", done);
-      }
-      function move(e) {
-        if (e.which != 1) return done();
-        self.moveTo(startpos + (e[axis] - start) * (self.total / self.size));
-      }
-      CodeMirror.on(document, "mousemove", move);
-      CodeMirror.on(document, "mouseup", done);
-    });
-
-    CodeMirror.on(this.node, "click", function(e) {
-      CodeMirror.e_preventDefault(e);
-      var innerBox = self.inner.getBoundingClientRect(), where;
-      if (self.orientation == "horizontal")
-        where = e.clientX < innerBox.left ? -1 : e.clientX > innerBox.right ? 1 : 0;
-      else
-        where = e.clientY < innerBox.top ? -1 : e.clientY > innerBox.bottom ? 1 : 0;
-      self.moveTo(self.pos + where * self.screen);
-    });
-
-    function onWheel(e) {
-      var moved = CodeMirror.wheelEventPixels(e)[self.orientation == "horizontal" ? "x" : "y"];
-      var oldPos = self.pos;
-      self.moveTo(self.pos + moved);
-      if (self.pos != oldPos) CodeMirror.e_preventDefault(e);
-    }
-    CodeMirror.on(this.node, "mousewheel", onWheel);
-    CodeMirror.on(this.node, "DOMMouseScroll", onWheel);
-  }
-
-  Bar.prototype.setPos = function(pos, force) {
-    if (pos < 0) pos = 0;
-    if (pos > this.total - this.screen) pos = this.total - this.screen;
-    if (!force && pos == this.pos) return false;
-    this.pos = pos;
-    this.inner.style[this.orientation == "horizontal" ? "left" : "top"] =
-      (pos * (this.size / this.total)) + "px";
-    return true
-  };
-
-  Bar.prototype.moveTo = function(pos) {
-    if (this.setPos(pos)) this.scroll(pos, this.orientation);
-  }
-
-  var minButtonSize = 10;
-
-  Bar.prototype.update = function(scrollSize, clientSize, barSize) {
-    var sizeChanged = this.screen != clientSize || this.total != scrollSize || this.size != barSize
-    if (sizeChanged) {
-      this.screen = clientSize;
-      this.total = scrollSize;
-      this.size = barSize;
-    }
-
-    var buttonSize = this.screen * (this.size / this.total);
-    if (buttonSize < minButtonSize) {
-      this.size -= minButtonSize - buttonSize;
-      buttonSize = minButtonSize;
-    }
-    this.inner.style[this.orientation == "horizontal" ? "width" : "height"] =
-      buttonSize + "px";
-    this.setPos(this.pos, sizeChanged);
-  };
-
-  function SimpleScrollbars(cls, place, scroll) {
-    this.addClass = cls;
-    this.horiz = new Bar(cls, "horizontal", scroll);
-    place(this.horiz.node);
-    this.vert = new Bar(cls, "vertical", scroll);
-    place(this.vert.node);
-    this.width = null;
-  }
-
-  SimpleScrollbars.prototype.update = function(measure) {
-    if (this.width == null) {
-      var style = window.getComputedStyle ? window.getComputedStyle(this.horiz.node) : this.horiz.node.currentStyle;
-      if (style) this.width = parseInt(style.height);
-    }
-    var width = this.width || 0;
-
-    var needsH = measure.scrollWidth > measure.clientWidth + 1;
-    var needsV = measure.scrollHeight > measure.clientHeight + 1;
-    this.vert.node.style.display = needsV ? "block" : "none";
-    this.horiz.node.style.display = needsH ? "block" : "none";
-
-    if (needsV) {
-      this.vert.update(measure.scrollHeight, measure.clientHeight,
-                       measure.viewHeight - (needsH ? width : 0));
-      this.vert.node.style.bottom = needsH ? width + "px" : "0";
-    }
-    if (needsH) {
-      this.horiz.update(measure.scrollWidth, measure.clientWidth,
-                        measure.viewWidth - (needsV ? width : 0) - measure.barLeft);
-      this.horiz.node.style.right = needsV ? width + "px" : "0";
-      this.horiz.node.style.left = measure.barLeft + "px";
-    }
-
-    return {right: needsV ? width : 0, bottom: needsH ? width : 0};
-  };
-
-  SimpleScrollbars.prototype.setScrollTop = function(pos) {
-    this.vert.setPos(pos);
-  };
-
-  SimpleScrollbars.prototype.setScrollLeft = function(pos) {
-    this.horiz.setPos(pos);
-  };
-
-  SimpleScrollbars.prototype.clear = function() {
-    var parent = this.horiz.node.parentNode;
-    parent.removeChild(this.horiz.node);
-    parent.removeChild(this.vert.node);
-  };
-
-  CodeMirror.scrollbarModel.simple = function(place, scroll) {
-    return new SimpleScrollbars("CodeMirror-simplescroll", place, scroll);
-  };
-  CodeMirror.scrollbarModel.overlay = function(place, scroll) {
-    return new SimpleScrollbars("CodeMirror-overlayscroll", place, scroll);
-  };
-});
-
 angular
   .module("PairProgramming", ["ui.router", "firebase"])
   // .constant("URL", "https://waytwocode.herokuapp.com")
@@ -71192,35 +71039,55 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   self.repos      = GithubService.repos;
   self.commitForm = commitForm;
   self.commit     = {};
+  self.init       = init;
 
+  // var ref = firebase.database().ref($stateParams.key);
   var ref = firebase.database().ref();
-  // self.data = $firebaseObject(ref);
+
+  ref.on('value', function(data) {
+    var tree = data.val()[$stateParams.key];
+
+    jsTreeService.buildTree(tree);
+
+    if (jsTreeService.file) {
+      var newContent = atob(tree.core.data[jsTreeService.node].content);
+      jsTreeService.content = newContent;
+      CodeMirrorService.changeFile(newContent, jsTreeService.file, jsTreeService.node);
+    }
+  });
+
+  ref.on("child_added", function(data){
+    if (!$stateParams.key) return false;
+    // console.log("CHILD ADDED", data.val());
+    // var tree = data.val();
+    // jsTreeService.buildTree(tree);
+  });
 
   ref.once('value').then(function(data){
     if (!$stateParams.key) return false;
-    console.log("why firebase???????!??????????????!!!?!");
+    console.log("ONCE");
     var key = $stateParams.key;
     CodeMirrorService.createCodeMirror();
 
-    ref.child(key).once("value").then(function(data){
-      var tree = data.val();
-      console.log("TREE DATA IS HERE",tree);
-      self.repo = tree.repo;
-      self.token = tree.token;
-      jsTreeService.buildTree(tree);
-    });
+    // ref.child(key).once("value").then(function(data){
+    //   var tree = data.val();
+    //   console.log("TREE DATA IS HERE",tree);
+    //   self.repo = tree.repo;
+    //   self.token = tree.token;
+    //   jsTreeService.buildTree(tree);
+    // });
   });
 
   function commitForm(){
     var message  = self.commit.message;
     var data     = CodeMirrorService.getValue();
-    var filePath = CodeMirrorService.filePath;
+    var filePath = jsTreeService.filePath;
     GithubService.makeCommit(filePath, data, message, self.repo, self.token);
   }
 
-  $("#repositories").on("click", function(){
+  function init(){
     GithubService.start();
-  });
+  }
 }
 
 angular
@@ -71232,7 +71099,6 @@ function CodeMirrorService(FirebaseService, $http){
   var self = this;
 
   self.changeFile = changeFile;
-  self.getValue = getValue;
   self.myCodeMirror = {};
   self.createCodeMirror = createCodeMirror;
 
@@ -71246,12 +71112,17 @@ function CodeMirrorService(FirebaseService, $http){
       mode: "javascript",
       viewportMargin: Infinity,
       theme: "monokai",
-      autoCloseBrackets: true,
-      scrollbarStyle: "overlay"
+      autoCloseBrackets: true
+    });
+
+    self.myCodeMirror.on("changes", function(cm, data){
+      var content = btoa(cm.getValue());
+      FirebaseService.updateNode(self.node, content);
     });
   }
 
-  function changeFile(content, file) {
+  function changeFile(content, file, node) {
+    self.node = node;
     var mode;
     switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
       case ".html":
@@ -71286,12 +71157,10 @@ function CodeMirrorService(FirebaseService, $http){
         break;
     }
 
+    var startCursor = self.myCodeMirror.getCursor();
     self.myCodeMirror.setOption("mode", mode);
     self.myCodeMirror.setValue(content);
-  }
-
-  function getValue(){
-    return btoa(self.myCodeMirror.getValue());
+    self.myCodeMirror.setCursor(startCursor);
   }
 }
 
@@ -71323,11 +71192,15 @@ function FirebaseService($state, $http, $stateParams){
   }
 
   function updateNode(node, data){
-    var url = "/update/" + self.key + "/" + node;
-    $http.post(url, data).then(function(res){
-      // console.log(res);
+    var url = "/update/" + $stateParams.key + "/" + node;
+    var content = { content: data };
+    $http.post(url, content).then(function(res){
       console.log("updated in firebase");
     });
+
+    // firebase.database().ref($stateParams.key + "/core/data" + node).update({
+    //   content: data
+    // });
   }
 
   function addData(data, repo, token){
@@ -71336,13 +71209,13 @@ function FirebaseService($state, $http, $stateParams){
     var url = "/add/" + self.key;
 
     setTimeout(function(){
-      console.log("addDATA", data);
-      console.log("addDATA", JSON.stringify(data));
+      // console.log("addDATA", data);
+      // console.log("addDATA", JSON.stringify(data));
       $http.post(url, JSON.stringify(data)).then(function(res){
         // console.log(res);
         console.log("added to firebase");
       });
-    }, 4000);
+    }, 1000);
   }
 }
 
@@ -71356,7 +71229,7 @@ function GithubService(jsTreeService, $http){
 
   self.start      = getToken;
   self.makeCommit = makeCommit;
-  self.putCommit  = putCommit;
+  // self.putCommit  = putCommit;
   self.repos = [];
 
   function getToken(){
@@ -71371,18 +71244,17 @@ function GithubService(jsTreeService, $http){
   }
 
   function getRepos(token){
-    $http.get("https://api.github.com/user/repos?access_token=" + token)
-      .then(function(res){
-        res.data.forEach(function(repo){
-          // self.repos = res.data;
-          self.repos.push(repo);
-        });
+    $http.get("https://api.github.com/user/repos?access_token=" + token).then(function(res){
+      res.data.forEach(function(repo){
+        // self.repos = res.data;
+        self.repos.push(repo);
+      });
 
-        $(".list-group").delegate(".list-group-item", "click", function(event){
-          var repo = event.currentTarget.id;
-          self.repo = repo;
-          jsTreeService.getSha(repo, token);
-        });
+      $(".list-group").delegate(".list-group-item", "click", function(event){
+        var repo = event.currentTarget.id;
+        self.repo = repo;
+        jsTreeService.getSha(repo, token);
+      });
     });
   }
 
@@ -71391,28 +71263,22 @@ function GithubService(jsTreeService, $http){
     var access_token = token ? token : self.token;
     var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
 
-    return $http.get(url)
-      .then(function(response) {
-        var sha = response.data.sha;
-        return putCommit(filePath, content, sha, url, message, access_token);
+    return $http.get(url).then(function(response) {
+      var sha = response.data.sha;
+      var data = {
+        message: message,
+        content: content,
+        sha: sha
+      };
+      var config = {
+        params: {
+          path: filePath,
+          access_token: access_token
+        }
+      };
+      $http.put(url, data, config).then(function(res){
+        console.log(res);
       });
-  }
-
-  function putCommit(filePath, content, sha, url, message, access_token){
-    console.log(access_token, "token");
-    var data = {
-      message: message,
-      content: content,
-      sha: sha,
-    };
-    var config = {
-      params: {
-        path: filePath,
-        access_token: access_token
-      }
-    };
-    $http.put(url, data, config).then(function(res){
-      console.log(res);
     });
   }
 }
@@ -71481,9 +71347,9 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
       }
 
       if (parent.length > 1) {
-        var tempParent = node.path.split("/");
+        var tempParent  = node.path.split("/");
         tempParent.pop();
-        var parentPath = tempParent.join("/");
+        var parentPath  = tempParent.join("/");
         treeData.parent = treeParents[parentPath];
       }
 
@@ -71492,20 +71358,18 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data, self.repo, self.token);
-
-    setTimeout(function(){
-      buildTree(data);
-    }, 3000);
-
   }
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
-      var file = data.instance.get_path(data.node,'/');
-      if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
+      self.file = data.instance.get_path(data.node,'/');
+      if (!self.file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      var content = $window.atob(data.node.original.content);
-      CodeMirrorService.changeFile(content, file);
+      self.filePath = data.node.original.filePath;
+      self.content  = $window.atob(data.node.original.content);
+      self.node     = data.node.id;
+
+      CodeMirrorService.changeFile(self.content, self.file, self.node);
 
     }).jstree({ "core": content.core },
     { "types" : {

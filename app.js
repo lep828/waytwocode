@@ -26,7 +26,6 @@ app.get("/", function(req, res) {
 
 app.post("/add/:key", function(req, res){
   var key = req.params.key;
-  console.log(req.body.core.data);
   database.ref("/" + key).update(req.body);
   res.json({ key: key });
 });
@@ -40,8 +39,11 @@ app.post("/get_data/:key/:id", function(req, res){
 
 app.post("/update/:key/:id", function(req, res){
   var url = req.params.key + "/core/data/" + req.params.id;
-  database.ref(url).update(req.body);
-  res.json(req.body);
+  console.log(url, req.body);
+  database.ref(url).update(req.body).then(function(){
+    console.log("updated");
+    return res.json(req.body);
+  });
 });
 
 app.get("/key", function(req, res){

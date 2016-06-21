@@ -62,9 +62,9 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
       }
 
       if (parent.length > 1) {
-        var tempParent = node.path.split("/");
+        var tempParent  = node.path.split("/");
         tempParent.pop();
-        var parentPath = tempParent.join("/");
+        var parentPath  = tempParent.join("/");
         treeData.parent = treeParents[parentPath];
       }
 
@@ -73,20 +73,18 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data, self.repo, self.token);
-
-    setTimeout(function(){
-      buildTree(data);
-    }, 3000);
-
   }
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
-      var file = data.instance.get_path(data.node,'/');
-      if (!file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
+      self.file = data.instance.get_path(data.node,'/');
+      if (!self.file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      var content = $window.atob(data.node.original.content);
-      CodeMirrorService.changeFile(content, file);
+      self.filePath = data.node.original.filePath;
+      self.content  = $window.atob(data.node.original.content);
+      self.node     = data.node.id;
+
+      CodeMirrorService.changeFile(self.content, self.file, self.node);
 
     }).jstree({ "core": content.core },
     { "types" : {

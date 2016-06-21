@@ -8,7 +8,7 @@ function GithubService(jsTreeService, $http){
 
   self.start      = getToken;
   self.makeCommit = makeCommit;
-  self.putCommit  = putCommit;
+  // self.putCommit  = putCommit;
   self.repos = [];
 
   function getToken(){
@@ -23,18 +23,17 @@ function GithubService(jsTreeService, $http){
   }
 
   function getRepos(token){
-    $http.get("https://api.github.com/user/repos?access_token=" + token)
-      .then(function(res){
-        res.data.forEach(function(repo){
-          // self.repos = res.data;
-          self.repos.push(repo);
-        });
+    $http.get("https://api.github.com/user/repos?access_token=" + token).then(function(res){
+      res.data.forEach(function(repo){
+        // self.repos = res.data;
+        self.repos.push(repo);
+      });
 
-        $(".list-group").delegate(".list-group-item", "click", function(event){
-          var repo = event.currentTarget.id;
-          self.repo = repo;
-          jsTreeService.getSha(repo, token);
-        });
+      $(".list-group").delegate(".list-group-item", "click", function(event){
+        var repo = event.currentTarget.id;
+        self.repo = repo;
+        jsTreeService.getSha(repo, token);
+      });
     });
   }
 
@@ -43,28 +42,22 @@ function GithubService(jsTreeService, $http){
     var access_token = token ? token : self.token;
     var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
 
-    return $http.get(url)
-      .then(function(response) {
-        var sha = response.data.sha;
-        return putCommit(filePath, content, sha, url, message, access_token);
+    return $http.get(url).then(function(response) {
+      var sha = response.data.sha;
+      var data = {
+        message: message,
+        content: content,
+        sha: sha
+      };
+      var config = {
+        params: {
+          path: filePath,
+          access_token: access_token
+        }
+      };
+      $http.put(url, data, config).then(function(res){
+        console.log(res);
       });
-  }
-
-  function putCommit(filePath, content, sha, url, message, access_token){
-    console.log(access_token, "token");
-    var data = {
-      message: message,
-      content: content,
-      sha: sha,
-    };
-    var config = {
-      params: {
-        path: filePath,
-        access_token: access_token
-      }
-    };
-    $http.put(url, data, config).then(function(res){
-      console.log(res);
     });
   }
 }

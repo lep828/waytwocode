@@ -26,11 +26,15 @@ function FirebaseService($state, $http, $stateParams){
   }
 
   function updateNode(node, data){
-    var url = "/update/" + self.key + "/" + node;
-    $http.post(url, data).then(function(res){
-      // console.log(res);
+    var url = "/update/" + $stateParams.key + "/" + node;
+    var content = { content: data };
+    $http.post(url, content).then(function(res){
       console.log("updated in firebase");
     });
+
+    // firebase.database().ref($stateParams.key + "/core/data" + node).update({
+    //   content: data
+    // });
   }
 
   function addData(data, repo, token){
@@ -39,12 +43,12 @@ function FirebaseService($state, $http, $stateParams){
     var url = "/add/" + self.key;
 
     setTimeout(function(){
-      console.log("addDATA", data);
-      console.log("addDATA", JSON.stringify(data));
+      // console.log("addDATA", data);
+      // console.log("addDATA", JSON.stringify(data));
       $http.post(url, JSON.stringify(data)).then(function(res){
         // console.log(res);
         console.log("added to firebase");
       });
-    }, 4000);
+    }, 1000);
   }
 }
