@@ -8,12 +8,11 @@ function GithubService(jsTreeService, $http){
 
   self.start      = getToken;
   self.makeCommit = makeCommit;
-  // self.putCommit  = putCommit;
   self.repos = [];
 
   function getToken(){
-    // $http.get('https://waytwocode.herokuapp.com/token').then(function(res){
-    $http.get('http://localhost:3000/token').then(function(res){
+    $http.get('https://waytwocode.herokuapp.com/token').then(function(res){
+    // $http.get('http://localhost:3000/token').then(function(res){
       var token = res.data.token;
       if(!token) return false;
       $("#githubLogin").hide();
@@ -25,7 +24,6 @@ function GithubService(jsTreeService, $http){
   function getRepos(token){
     $http.get("https://api.github.com/user/repos?access_token=" + token).then(function(res){
       res.data.forEach(function(repo){
-        // self.repos = res.data;
         self.repos.push(repo);
       });
 

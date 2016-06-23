@@ -10,12 +10,11 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
   self.commit     = {};
   self.init       = init;
 
-  // var ref = firebase.database().ref($stateParams.key);
   var ref = firebase.database().ref();
 
   ref.on('value', function(data) {
     var tree = data.val()[$stateParams.key];
-
+    // console.log(tree);
     jsTreeService.buildTree(tree);
 
     if (jsTreeService.file) {
@@ -25,26 +24,18 @@ function MainController(GithubService, CodeMirrorService, jsTreeService, $fireba
     }
   });
 
-  ref.on("child_added", function(data){
-    if (!$stateParams.key) return false;
-    // console.log("CHILD ADDED", data.val());
-    // var tree = data.val();
-    // jsTreeService.buildTree(tree);
-  });
+  // ref.on("child_added", function(data){
+  //   if (!$stateParams.key) return false;
+  //   console.log("CHILD ADDED", data.val());
+  //   var tree = data.val();
+  //   jsTreeService.buildTree(tree);
+  // });
 
   ref.once('value').then(function(data){
     if (!$stateParams.key) return false;
     console.log("ONCE");
     var key = $stateParams.key;
     CodeMirrorService.createCodeMirror();
-
-    // ref.child(key).once("value").then(function(data){
-    //   var tree = data.val();
-    //   console.log("TREE DATA IS HERE",tree);
-    //   self.repo = tree.repo;
-    //   self.token = tree.token;
-    //   jsTreeService.buildTree(tree);
-    // });
   });
 
   function commitForm(){

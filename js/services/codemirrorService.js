@@ -6,8 +6,8 @@ CodeMirrorService.$inject = ["FirebaseService", "$http"];
 function CodeMirrorService(FirebaseService, $http){
   var self = this;
 
-  self.changeFile = changeFile;
-  self.myCodeMirror = {};
+  self.changeFile       = changeFile;
+  self.myCodeMirror     = {};
   self.createCodeMirror = createCodeMirror;
 
   function createCodeMirror(){
@@ -23,9 +23,13 @@ function CodeMirrorService(FirebaseService, $http){
       autoCloseBrackets: true
     });
 
-    self.myCodeMirror.on("changes", function(cm, data){
+    self.myCodeMirror.on("change", function(cm){
       var content = btoa(cm.getValue());
-      FirebaseService.updateNode(self.node, content);
+      if(self.content === content) return false;
+      console.log("1", self.content);
+      console.log("2", content);
+      self.content = content;
+      FirebaseService.updateNode(self.node, self.content);
     });
   }
 
@@ -34,11 +38,7 @@ function CodeMirrorService(FirebaseService, $http){
     var mode;
     switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
       case ".html":
-        mode = "xml";
-        break;
       case ".erb":
-        mode = "xml";
-        break;
       case ".ejs":
         mode = "xml";
         break;

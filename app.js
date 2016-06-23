@@ -39,7 +39,7 @@ app.post("/get_data/:key/:id", function(req, res){
 
 app.post("/update/:key/:id", function(req, res){
   var url = req.params.key + "/core/data/" + req.params.id;
-  console.log(url, req.body);
+  // console.log(url, req.body);
   database.ref(url).update(req.body).then(function(){
     console.log("updated");
     return res.json(req.body);
@@ -58,8 +58,8 @@ app.get("/github", function(req, res){
     client_id: process.env.GITHUB_CLIENT_ID,
     client_secret:  process.env.GITHUB_CLIENT_SECRET,
     code: req.query.code,
-    // redirect_uri: "https://waytwocode.herokuapp.com/github"
-    redirect_uri: "http://localhost:3000/github"
+    redirect_uri: "https://waytwocode.herokuapp.com/github"
+    // redirect_uri: "http://localhost:3000/github"
   };
   var params = serializeObject(data);
 

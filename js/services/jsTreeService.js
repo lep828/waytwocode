@@ -20,8 +20,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
     var url = "https://api.github.com/repos/" + self.repo + "/git/refs/heads/master?access_token=" + token;
     $http.get(url).then(function(res){
       CodeMirrorService.createCodeMirror();
-      // console.log("First response", res);
-      var sha = res.data.object.sha;
+      var sha  = res.data.object.sha;
       self.sha = sha;
       getTree(token);
     });
@@ -42,7 +41,7 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
       treeParents[node.path] = tree.indexOf(node);
     });
 
-    var jsTreeData = tree.map(function(node){
+    var jsTreeData   = tree.map(function(node){
       var parent     = node.path.split("/");
       var treeData   = {};
 
@@ -73,10 +72,12 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
 
     var data = { 'core' : { 'data' : jsTreeData } };
     FirebaseService.addData(data, self.repo, self.token);
+    console.log("HERE", data);
   }
 
   function buildTree(content){
     $('#jstree').on('select_node.jstree', function (e, data) {
+
       self.file = data.instance.get_path(data.node,'/');
       if (!self.file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
