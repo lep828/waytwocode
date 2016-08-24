@@ -71002,15 +71002,18 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
   }
 });
 
-angular
+(function(){
+  'use strict';
+
+  angular
   .module("PairProgramming", ["ui.router", "firebase"])
   .config(MainRouter);
 
-MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
-function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
-  $locationProvider.html5Mode(true);
+  MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
+  function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
+    $locationProvider.html5Mode(true);
 
-  $stateProvider
+    $stateProvider
     .state("splash", {
       url: "/",
       templateUrl: "views/splash.html"
@@ -71024,336 +71027,357 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
       templateUrl: "views/code.html"
     });
 
-  $urlRouterProvider.otherwise("/");
-}
+    $urlRouterProvider.otherwise("/");
+  }
+})();
 
-angular
+(function(){
+  'use strict';
+
+  angular
   .module("PairProgramming")
   .controller("MainController", MainController);
 
-MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService', '$firebaseObject', '$stateParams'];
-function MainController(GithubService, CodeMirrorService, jsTreeService, $firebaseObject, $stateParams){
-  var self        = this;
-  self.repos      = GithubService.repos;
-  self.commitForm = commitForm;
-  self.commit     = {};
-  self.init       = init;
+  MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService', '$firebaseObject', '$stateParams'];
+  function MainController(GithubService, CodeMirrorService, jsTreeService, $firebaseObject, $stateParams){
+    var self        = this;
+    self.repos      = GithubService.repos;
+    self.commitForm = commitForm;
+    self.commit     = {};
+    self.init       = init;
 
-  var ref = firebase.database().ref();
+    var ref = firebase.database().ref();
 
-  ref.on('value', function(data) {
-    var tree = data.val()[$stateParams.key];
-    // console.log(tree);
-    jsTreeService.buildTree(tree);
+    ref.on('value', function(data) {
+      var tree = data.val()[$stateParams.key];
+      // console.log(tree);
+      jsTreeService.buildTree(tree);
 
-    if (jsTreeService.file) {
-      var newContent = atob(tree.core.data[jsTreeService.node].content);
-      jsTreeService.content = newContent;
-      CodeMirrorService.changeFile(newContent, jsTreeService.file, jsTreeService.node);
+      if (jsTreeService.file) {
+        var newContent = atob(tree.core.data[jsTreeService.node].content);
+        jsTreeService.content = newContent;
+        CodeMirrorService.changeFile(newContent, jsTreeService.file, jsTreeService.node);
+      }
+    });
+
+    // ref.on("child_added", function(data){
+    //   if (!$stateParams.key) return false;
+    //   console.log("CHILD ADDED", data.val());
+    //   var tree = data.val();
+    //   jsTreeService.buildTree(tree);
+    // });
+
+    ref.once('value').then(function(data){
+      if (!$stateParams.key) return false;
+      console.log("ONCE");
+      var key = $stateParams.key;
+      CodeMirrorService.createCodeMirror();
+    });
+
+    function commitForm(){
+      var message  = self.commit.message;
+      var data     = CodeMirrorService.getValue();
+      var filePath = jsTreeService.filePath;
+      GithubService.makeCommit(filePath, data, message, self.repo, self.token);
     }
-  });
 
-  // ref.on("child_added", function(data){
-  //   if (!$stateParams.key) return false;
-  //   console.log("CHILD ADDED", data.val());
-  //   var tree = data.val();
-  //   jsTreeService.buildTree(tree);
-  // });
-
-  ref.once('value').then(function(data){
-    if (!$stateParams.key) return false;
-    console.log("ONCE");
-    var key = $stateParams.key;
-    CodeMirrorService.createCodeMirror();
-  });
-
-  function commitForm(){
-    var message  = self.commit.message;
-    var data     = CodeMirrorService.getValue();
-    var filePath = jsTreeService.filePath;
-    GithubService.makeCommit(filePath, data, message, self.repo, self.token);
+    function init(){
+      GithubService.start();
+    }
   }
+})();
 
-  function init(){
-    GithubService.start();
-  }
-}
+(function(){
+  'use strict';
 
-angular
+  angular
   .module("PairProgramming")
   .service("CodeMirrorService", CodeMirrorService);
 
-CodeMirrorService.$inject = ["FirebaseService", "$http"];
-function CodeMirrorService(FirebaseService, $http){
-  var self = this;
+  CodeMirrorService.$inject = ["FirebaseService", "$http"];
+  function CodeMirrorService(FirebaseService, $http){
+    var self = this;
 
-  self.changeFile       = changeFile;
-  self.myCodeMirror     = {};
-  self.createCodeMirror = createCodeMirror;
+    self.changeFile       = changeFile;
+    self.myCodeMirror     = {};
+    self.createCodeMirror = createCodeMirror;
 
-  function createCodeMirror(){
-    $("#editor").empty();
-    self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
-      lineNumbers: true,
-      lineWrapping: true,
-      tabSize: 2,
-      value: "",
-      mode: "javascript",
-      viewportMargin: Infinity,
-      theme: "monokai",
-      autoCloseBrackets: true
-    });
+    function createCodeMirror(){
+      $("#editor").empty();
+      self.myCodeMirror = CodeMirror(document.getElementById("editor"), {
+        lineNumbers: true,
+        lineWrapping: true,
+        tabSize: 2,
+        value: "",
+        mode: "javascript",
+        viewportMargin: Infinity,
+        theme: "monokai",
+        autoCloseBrackets: true
+      });
 
-    self.myCodeMirror.on("change", function(cm){
-      var content = btoa(cm.getValue());
-      if(self.content === content) return false;
-      console.log("1", self.content);
-      console.log("2", content);
-      self.content = content;
-      FirebaseService.updateNode(self.node, self.content);
-    });
-  }
-
-  function changeFile(content, file, node) {
-    self.node = node;
-    var mode;
-    switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
-      case ".html":
-      case ".erb":
-      case ".ejs":
-        mode = "xml";
-        break;
-      case ".js":
-        mode = "javascript";
-        break;
-      case ".css":
-        mode = "css";
-        break;
-      case ".scss":
-        mode = "scss";
-        break;
-      case ".sass":
-        mode = "sass";
-        break;
-      case ".rb":
-        mode = "ruby";
-        break;
-      case ".php":
-        mode = "php";
-        break;
-      case ".md":
-        mode = "markdown";
-        break;
+      self.myCodeMirror.on("change", function(cm){
+        var content = btoa(cm.getValue());
+        if(self.content === content) return false;
+        console.log("1", self.content);
+        console.log("2", content);
+        self.content = content;
+        FirebaseService.updateNode(self.node, self.content);
+      });
     }
 
-    var startCursor = self.myCodeMirror.getCursor();
-    self.myCodeMirror.setOption("mode", mode);
-    self.myCodeMirror.setValue(content);
-    self.myCodeMirror.setCursor(startCursor);
-  }
-}
+    function changeFile(content, file, node) {
+      self.node = node;
+      var mode;
+      switch (file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)[0]) {
+        case ".html":
+        case ".erb":
+        case ".ejs":
+        mode = "xml";
+        break;
+        case ".js":
+        mode = "javascript";
+        break;
+        case ".css":
+        mode = "css";
+        break;
+        case ".scss":
+        mode = "scss";
+        break;
+        case ".sass":
+        mode = "sass";
+        break;
+        case ".rb":
+        mode = "ruby";
+        break;
+        case ".php":
+        mode = "php";
+        break;
+        case ".md":
+        mode = "markdown";
+        break;
+      }
 
-angular
+      var startCursor = self.myCodeMirror.getCursor();
+      self.myCodeMirror.setOption("mode", mode);
+      self.myCodeMirror.setValue(content);
+      self.myCodeMirror.setCursor(startCursor);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
   .module("PairProgramming")
   .service("FirebaseService", FirebaseService);
 
-FirebaseService.$inject = ["$state", "$http", "$stateParams"];
-function FirebaseService($state, $http, $stateParams){
-  var self = this;
+  FirebaseService.$inject = ["$state", "$http", "$stateParams"];
+  function FirebaseService($state, $http, $stateParams){
+    var self = this;
 
-  self.addData    = addData;
-  self.updateNode = updateNode;
-  self.createKey  = createKey;
-  self.getData    = getData;
+    self.addData    = addData;
+    self.updateNode = updateNode;
+    self.createKey  = createKey;
+    self.getData    = getData;
 
-  function getData(node, cb){
-    url = "/get_data/" + $stateParams.key + "/" + node;
-    $http.get(url).then(function(res){
-      return cb(res);
-    });
-  }
-
-  function createKey(){
-    $http.get("/key").then(function(res){
-      self.key = res.data.key;
-    });
-  }
-
-  function updateNode(node, data){
-    var url = "/update/" + $stateParams.key + "/" + node;
-    var content = { content: data };
-    $http.post(url, content).then(function(res){
-      // console.log(res);
-      console.log("updated in firebase");
-    });
-  }
-
-  function addData(data, repo, token){
-    data.repo = repo;
-    data.token = token;
-    var url = "/add/" + self.key;
-
-    setTimeout(function(){
-      $http.post(url, JSON.stringify(data)).then(function(res){
-        console.log("added to firebase");
+    function getData(node, cb){
+      url = "/get_data/" + $stateParams.key + "/" + node;
+      $http.get(url).then(function(res){
+        return cb(res);
       });
-    }, 1000);
-  }
-}
+    }
 
-angular
-.module("PairProgramming")
-.service("GithubService", GithubService);
-
-GithubService.$inject = ["jsTreeService", "$http"];
-function GithubService(jsTreeService, $http){
-  var self = this;
-
-  self.start      = getToken;
-  self.makeCommit = makeCommit;
-  self.repos = [];
-
-  function getToken(){
-    $http.get('https://waytwocode.herokuapp.com/token').then(function(res){
-    // $http.get('http://localhost:3000/token').then(function(res){
-      var token = res.data.token;
-      if(!token) return false;
-      $("#githubLogin").hide();
-      self.token = token;
-      getRepos(token);
-    });
-  }
-
-  function getRepos(token){
-    $http.get("https://api.github.com/user/repos?access_token=" + token).then(function(res){
-      res.data.forEach(function(repo){
-        self.repos.push(repo);
+    function createKey(){
+      $http.get("/key").then(function(res){
+        self.key = res.data.key;
       });
+    }
 
-      $(".list-group").delegate(".list-group-item", "click", function(event){
-        var repo = event.currentTarget.id;
-        self.repo = repo;
-        jsTreeService.getSha(repo, token);
+    function updateNode(node, data){
+      var url = "/update/" + $stateParams.key + "/" + node;
+      var content = { content: data };
+      $http.post(url, content).then(function(res){
+        // console.log(res);
+        console.log("updated in firebase");
       });
-    });
+    }
+
+    function addData(data, repo, token){
+      data.repo = repo;
+      data.token = token;
+      var url = "/add/" + self.key;
+
+      setTimeout(function(){
+        $http.post(url, JSON.stringify(data)).then(function(res){
+          console.log("added to firebase");
+        });
+      }, 1000);
+    }
   }
+})();
 
-  function makeCommit(filePath, content, message, repo, token) {
-    var repository = repo ? repo : self.repo;
-    var access_token = token ? token : self.token;
-    var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
+(function(){
+  'use strict';
 
-    return $http.get(url).then(function(response) {
-      var sha = response.data.sha;
-      var data = {
-        message: message,
-        content: content,
-        sha: sha
-      };
-      var config = {
-        params: {
-          path: filePath,
-          access_token: access_token
-        }
-      };
-      $http.put(url, data, config).then(function(res){
-        console.log(res);
+  angular
+  .module("PairProgramming")
+  .service("GithubService", GithubService);
+
+  GithubService.$inject = ["jsTreeService", "$http"];
+  function GithubService(jsTreeService, $http){
+    var self = this;
+
+    self.start      = getToken;
+    self.makeCommit = makeCommit;
+    self.repos = [];
+
+    function getToken(){
+      $http.get('https://waytwocode.herokuapp.com/token').then(function(res){
+        // $http.get('http://localhost:3000/token').then(function(res){
+        var token = res.data.token;
+        if(!token) return false;
+        $("#githubLogin").hide();
+        self.token = token;
+        getRepos(token);
       });
-    });
-  }
-}
+    }
 
-angular
+    function getRepos(token){
+      $http.get("https://api.github.com/user/repos?access_token=" + token).then(function(res){
+        res.data.forEach(function(repo){
+          self.repos.push(repo);
+        });
+
+        $(".list-group").delegate(".list-group-item", "click", function(event){
+          var repo = event.currentTarget.id;
+          self.repo = repo;
+          jsTreeService.getSha(repo, token);
+        });
+      });
+    }
+
+    function makeCommit(filePath, content, message, repo, token) {
+      var repository = repo ? repo : self.repo;
+      var access_token = token ? token : self.token;
+      var url = "https://api.github.com/repos/"+repository+"/contents/"+filePath;
+
+      return $http.get(url).then(function(response) {
+        var sha = response.data.sha;
+        var data = {
+          message: message,
+          content: content,
+          sha: sha
+        };
+        var config = {
+          params: {
+            path: filePath,
+            access_token: access_token
+          }
+        };
+        $http.put(url, data, config).then(function(res){
+          console.log(res);
+        });
+      });
+    }
+  }
+})();
+
+(function(){
+  'use strict';
+
+  angular
   .module("PairProgramming")
   .service("jsTreeService", jsTreeService);
 
-jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http", "$window"];
-function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $window){
-  FirebaseService.createKey();
+  jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http", "$window"];
+  function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $window){
+    FirebaseService.createKey();
+    
+    /*jshint validthis: true */
+    var self       = this;
 
-  var self       = this;
+    self.getSha    = getSha;
+    self.buildTree = buildTree;
 
-  self.getSha    = getSha;
-  self.buildTree = buildTree;
+    function getSha(repo, token){
+      $state.go("code", { key: FirebaseService.key });
+      self.repo = repo;
+      self.token = token;
+      $("#commit").css("display", "block");
 
-  function getSha(repo, token){
-    $state.go("code", { key: FirebaseService.key });
-    self.repo = repo;
-    self.token = token;
-    $("#commit").css("display", "block");
+      var url = "https://api.github.com/repos/" + self.repo + "/git/refs/heads/master?access_token=" + token;
+      $http.get(url).then(function(res){
+        CodeMirrorService.createCodeMirror();
+        var sha  = res.data.object.sha;
+        self.sha = sha;
+        getTree(token);
+      });
+    }
 
-    var url = "https://api.github.com/repos/" + self.repo + "/git/refs/heads/master?access_token=" + token;
-    $http.get(url).then(function(res){
-      CodeMirrorService.createCodeMirror();
-      var sha  = res.data.object.sha;
-      self.sha = sha;
-      getTree(token);
-    });
-  }
+    function getTree(token){
+      var url = "https://api.github.com/repos/" + self.repo + "/git/trees/" + self.sha + "?recursive=1&access_token=" + token;
+      $http.get(url).then(function(res){
+        var tree  = res.data.tree;
+        structureTree(tree);
+      });
+    }
 
-  function getTree(token){
-    var url = "https://api.github.com/repos/" + self.repo + "/git/trees/" + self.sha + "?recursive=1&access_token=" + token;
-    $http.get(url).then(function(res){
-      var tree  = res.data.tree;
-      structureTree(tree);
-    });
-  }
+    function structureTree(tree){
+      var treeParents = {};
 
-  function structureTree(tree){
-    var treeParents = {};
+      tree.forEach(function(node){
+        treeParents[node.path] = tree.indexOf(node);
+      });
 
-    tree.forEach(function(node){
-      treeParents[node.path] = tree.indexOf(node);
-    });
+      var jsTreeData   = tree.map(function(node){
+        var parent     = node.path.split("/");
+        var treeData   = {};
 
-    var jsTreeData   = tree.map(function(node){
-      var parent     = node.path.split("/");
-      var treeData   = {};
+        treeData.id       = treeParents[parent.join("/")];
+        treeData.type     = node.type === "tree" ? "folder" : "file";
+        treeData.text     = parent.length === 1 ? node.path : parent[parent.length-1];
+        treeData.filePath = node.path;
+        treeData.parent   = "#";
 
-      treeData.id       = treeParents[parent.join("/")];
-      treeData.type     = node.type === "tree" ? "folder" : "file";
-      treeData.text     = parent.length === 1 ? node.path : parent[parent.length-1];
-      treeData.filePath = node.path;
-      treeData.parent   = "#";
-
-      if (treeData.type === "file") {
-        if (treeData.filePath.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
+        if (treeData.type === "file") {
+          if (treeData.filePath.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) {
             var raw = "https://raw.githubusercontent.com/" + self.repo + "/master/" + treeData.filePath;
             $http.get(raw).then(function(res){
               treeData.content = btoa(res.data);
             });
+          }
         }
-      }
 
-      if (parent.length > 1) {
-        var tempParent  = node.path.split("/");
-        tempParent.pop();
-        var parentPath  = tempParent.join("/");
-        treeData.parent = treeParents[parentPath];
-      }
+        if (parent.length > 1) {
+          var tempParent  = node.path.split("/");
+          tempParent.pop();
+          var parentPath  = tempParent.join("/");
+          treeData.parent = treeParents[parentPath];
+        }
 
-      return treeData;
-    });
+        return treeData;
+      });
 
-    var data = { 'core' : { 'data' : jsTreeData } };
-    FirebaseService.addData(data, self.repo, self.token);
-    console.log("HERE", data);
-  }
+      var data = { 'core' : { 'data' : jsTreeData } };
+      FirebaseService.addData(data, self.repo, self.token);
+      console.log("HERE", data);
+    }
 
-  function buildTree(content){
-    $('#jstree').on('select_node.jstree', function (e, data) {
+    function buildTree(content){
+      $('#jstree').on('select_node.jstree', function (e, data) {
 
-      self.file = data.instance.get_path(data.node,'/');
-      if (!self.file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
+        self.file = data.instance.get_path(data.node,'/');
+        if (!self.file.match(/(?:\.html|\.js|\.css|\.scss|\.sass|\.rb|\.php|\.erb|\.ejs|\.md)/)) return false;
 
-      self.filePath = data.node.original.filePath;
-      self.content  = $window.atob(data.node.original.content);
-      self.node     = data.node.id;
+        self.filePath = data.node.original.filePath;
+        self.content  = $window.atob(data.node.original.content);
+        self.node     = data.node.id;
 
-      CodeMirrorService.changeFile(self.content, self.file, self.node);
+        CodeMirrorService.changeFile(self.content, self.file, self.node);
 
-    }).jstree({ "core": content.core },
-    { "types" : {
+      }).jstree({ "core": content.core },
+      { "types" : {
         "folder" : {
           "icon" : "public/images/folder.png"
         },
@@ -71365,3 +71389,4 @@ function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $windo
     });
   }
 }
+})();

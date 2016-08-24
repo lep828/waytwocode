@@ -1,12 +1,15 @@
-angular
+(function(){
+  'use strict';
+
+  angular
   .module("PairProgramming", ["ui.router", "firebase"])
   .config(MainRouter);
 
-MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
-function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
-  $locationProvider.html5Mode(true);
+  MainRouter.$inject = ["$stateProvider", "$urlRouterProvider", "$locationProvider"];
+  function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
+    $locationProvider.html5Mode(true);
 
-  $stateProvider
+    $stateProvider
     .state("splash", {
       url: "/",
       templateUrl: "views/splash.html"
@@ -20,5 +23,6 @@ function MainRouter($stateProvider, $urlRouterProvider, $locationProvider){
       templateUrl: "views/code.html"
     });
 
-  $urlRouterProvider.otherwise("/");
-}
+    $urlRouterProvider.otherwise("/");
+  }
+})();
