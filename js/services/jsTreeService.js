@@ -8,7 +8,7 @@
   jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http", "$window"];
   function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $window){
     FirebaseService.createKey();
-    
+
     /*jshint validthis: true */
     var self       = this;
 
@@ -76,7 +76,7 @@
 
       var data = { 'core' : { 'data' : jsTreeData } };
       FirebaseService.addData(data, self.repo, self.token);
-      console.log("HERE", data);
+      // console.log("HERE", data);
     }
 
     function buildTree(content){

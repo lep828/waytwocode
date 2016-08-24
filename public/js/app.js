@@ -71060,16 +71060,8 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
       }
     });
 
-    // ref.on("child_added", function(data){
-    //   if (!$stateParams.key) return false;
-    //   console.log("CHILD ADDED", data.val());
-    //   var tree = data.val();
-    //   jsTreeService.buildTree(tree);
-    // });
-
     ref.once('value').then(function(data){
       if (!$stateParams.key) return false;
-      console.log("ONCE");
       var key = $stateParams.key;
       CodeMirrorService.createCodeMirror();
     });
@@ -71118,8 +71110,8 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
       self.myCodeMirror.on("change", function(cm){
         var content = btoa(cm.getValue());
         if(self.content === content) return false;
-        console.log("1", self.content);
-        console.log("2", content);
+        // console.log("1", self.content);
+        // console.log("2", content);
         self.content = content;
         FirebaseService.updateNode(self.node, self.content);
       });
@@ -71293,7 +71285,7 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
   jsTreeService.$inject = ["CodeMirrorService", "FirebaseService", "$state", "$http", "$window"];
   function jsTreeService(CodeMirrorService, FirebaseService, $state, $http, $window){
     FirebaseService.createKey();
-    
+
     /*jshint validthis: true */
     var self       = this;
 
@@ -71361,7 +71353,7 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
       var data = { 'core' : { 'data' : jsTreeData } };
       FirebaseService.addData(data, self.repo, self.token);
-      console.log("HERE", data);
+      // console.log("HERE", data);
     }
 
     function buildTree(content){

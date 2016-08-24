@@ -29,8 +29,8 @@
       self.myCodeMirror.on("change", function(cm){
         var content = btoa(cm.getValue());
         if(self.content === content) return false;
-        console.log("1", self.content);
-        console.log("2", content);
+        // console.log("1", self.content);
+        // console.log("2", content);
         self.content = content;
         FirebaseService.updateNode(self.node, self.content);
       });

@@ -27,16 +27,8 @@
       }
     });
 
-    // ref.on("child_added", function(data){
-    //   if (!$stateParams.key) return false;
-    //   console.log("CHILD ADDED", data.val());
-    //   var tree = data.val();
-    //   jsTreeService.buildTree(tree);
-    // });
-
     ref.once('value').then(function(data){
       if (!$stateParams.key) return false;
-      console.log("ONCE");
       var key = $stateParams.key;
       CodeMirrorService.createCodeMirror();
     });
