@@ -7,6 +7,8 @@
 
   CodeMirrorService.$inject = ["FirebaseService", "$http"];
   function CodeMirrorService(FirebaseService, $http){
+
+    /*jshint validthis: true */
     var self = this;
 
     self.changeFile       = changeFile;

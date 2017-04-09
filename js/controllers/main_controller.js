@@ -7,7 +7,10 @@
 
   MainController.$inject = ['GithubService', 'CodeMirrorService', 'jsTreeService', '$firebaseObject', '$stateParams'];
   function MainController(GithubService, CodeMirrorService, jsTreeService, $firebaseObject, $stateParams){
+
+    /*jshint validthis: true */
     var self        = this;
+    
     self.repos      = GithubService.repos;
     self.commitForm = commitForm;
     self.commit     = {};

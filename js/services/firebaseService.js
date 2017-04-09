@@ -7,6 +7,8 @@
 
   FirebaseService.$inject = ["$state", "$http", "$stateParams"];
   function FirebaseService($state, $http, $stateParams){
+
+    /*jshint validthis: true */
     var self = this;
 
     self.addData    = addData;

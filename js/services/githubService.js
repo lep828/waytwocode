@@ -7,6 +7,8 @@
 
   GithubService.$inject = ["jsTreeService", "$http"];
   function GithubService(jsTreeService, $http){
+
+    /*jshint validthis: true */
     var self = this;
 
     self.start      = getToken;
